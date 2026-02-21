@@ -1,247 +1,373 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="fr">
-<head>
-    <meta charset="UTF-8">
+  <head>
+    <meta charset="UTF-8" />
     <title>QA Virtual Device Laboratory - V4.0</title>
     <style>
-        :root { --phone-bg: #000; --phone-border: #222; --accent: #e91e63; }
-        html, body { overscroll-behavior: none !important; }
-        body { background: #0a0a0a; display: flex; flex-direction: column; align-items: center; padding: 10px; font-family: 'Segoe UI', system-ui, sans-serif; color: #eee; margin: 0; min-height: 100vh; overflow-x: hidden; }
-        
-        /* HEADER PREMIUM */
-        header { text-align: center; margin-bottom: 20px; border-bottom: 1px solid #333; width: 100%; padding-bottom: 15px; }
-        h1 { margin: 0; font-size: 20px; letter-spacing: 2px; text-transform: uppercase; color: var(--accent); }
-        .stats { font-family: 'Consolas', monospace; color: #666; font-size: 12px; margin-top: 5px; }
+      :root {
+        --phone-bg: #000;
+        --phone-border: #222;
+        --accent: #e91e63;
+      }
+      html,
+      body {
+        overscroll-behavior: none !important;
+      }
+      body {
+        background: #0a0a0a;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: 10px;
+        font-family: "Segoe UI", system-ui, sans-serif;
+        color: #eee;
+        margin: 0;
+        min-height: 100vh;
+        overflow-x: hidden;
+      }
 
-        /* PRESETS BAR */
-        .presets { display: flex; gap: 8px; margin-bottom: 20px; flex-wrap: wrap; justify-content: center; }
-        .btn-preset { background: #222; border: 1px solid #444; color: #fff; padding: 6px 12px; border-radius: 20px; cursor: pointer; font-size: 11px; transition: 0.2s; }
-        .btn-preset:hover { border-color: var(--accent); color: var(--accent); }
-        .btn-preset.active { background: var(--accent); border-color: var(--accent); }
+      /* HEADER PREMIUM */
+      header {
+        text-align: center;
+        margin-bottom: 20px;
+        border-bottom: 1px solid #333;
+        width: 100%;
+        padding-bottom: 15px;
+      }
+      h1 {
+        margin: 0;
+        font-size: 20px;
+        letter-spacing: 2px;
+        text-transform: uppercase;
+        color: var(--accent);
+      }
+      .stats {
+        font-family: "Consolas", monospace;
+        color: #666;
+        font-size: 12px;
+        margin-top: 5px;
+      }
 
-        /* DEVICE FRAME (BEZELS) */
-        .device-frame { 
-            background: var(--phone-bg);
-            border: 12px solid var(--phone-border);
-            border-radius: 40px; 
-            box-shadow: 0 50px 100px rgba(0,0,0,0.8), 0 0 0 4px #1a1a1a;
-            position: relative;
-            transition: all 0.5s cubic-bezier(0.19, 1, 0.22, 1);
-            display: block;
-            overflow: hidden;
-            pointer-events: auto; 
-            touch-action: auto !important; /* Libère le contrôle pour Turn.js */
-        }
-        
-        /* NOTCH / CAPSULE */
-        .device-frame::before {
-            content: "";
-            position: absolute;
-            top: 10px;
-            width: 100px;
-            height: 25px;
-            background: #111;
-            border-radius: 20px;
-            z-index: 100;
-            pointer-events: none; /* Notch purement décoratif, ne doit pas bloquer les gestes */
-        }
+      /* PRESETS BAR */
+      .presets {
+        display: flex;
+        gap: 8px;
+        margin-bottom: 20px;
+        flex-wrap: wrap;
+        justify-content: center;
+      }
+      .btn-preset {
+        background: #222;
+        border: 1px solid #444;
+        color: #fff;
+        padding: 6px 12px;
+        border-radius: 20px;
+        cursor: pointer;
+        font-size: 11px;
+        transition: 0.2s;
+      }
+      .btn-preset:hover {
+        border-color: var(--accent);
+        color: var(--accent);
+      }
+      .btn-preset.active {
+        background: var(--accent);
+        border-color: var(--accent);
+      }
 
-        #preview-container {
-            display: flex !important;
-            justify-content: center !important;
-            align-items: center !important;
-            width: 100%;
-            height: 100%;
-            overflow: hidden;
-        }
+      /* DEVICE FRAME (BEZELS) */
+      .device-frame {
+        box-sizing: border-box; /* ✅ Fix: w/h incluent la bordure */
+        background: var(--phone-bg);
+        border: 12px solid var(--phone-border);
+        border-radius: 40px;
+        box-shadow:
+          0 50px 100px rgba(0, 0, 0, 0.8),
+          0 0 0 4px #1a1a1a;
+        position: relative;
+        transition: all 0.5s cubic-bezier(0.19, 1, 0.22, 1);
+        display: block;
+        overflow: hidden;
+        pointer-events: auto;
+        touch-action: auto !important; /* Libère le contrôle pour Turn.js */
+      }
 
-        #preview {
-            margin: auto !important;
-            border: none;
-            background: transparent;
-            pointer-events: auto !important;
-            touch-action: none !important; /* Turn.js préfère gérer lui-même sans interférence navigateur */
-            user-select: none;
-            -webkit-user-drag: none;
-        }
+      /* NOTCH / CAPSULE */
+      .device-frame::before {
+        content: "";
+        position: absolute;
+        top: 10px;
+        width: 100px;
+        height: 25px;
+        background: #111;
+        border-radius: 20px;
+        z-index: 100;
+        pointer-events: none; /* Notch purement décoratif, ne doit pas bloquer les gestes */
+      }
 
-        /* STATUS BADGE */
-        #status-badge {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            padding: 5px 15px;
-            border-radius: 15px;
-            font-size: 10px;
-            font-weight: bold;
-            background: #222;
-        }
+      #preview-container {
+        display: flex !important;
+        justify-content: center !important;
+        align-items: center !important;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+      }
 
-        /* SWIPE HINT V4 (ASSET OFFICIEL) */
-        #swipe-hint {
-            position: absolute;
-            bottom: 20px;
-            right: 20px;
-            width: 100px;
-            height: 100px;
-            z-index: 200;
-            pointer-events: none;
-            opacity: 0;
-            background: url("./assets/swipe-left.png") no-repeat center;
-            background-size: contain;
-            filter: drop-shadow(0 5px 15px rgba(0,0,0,0.3));
-        }
-        #swipe-hint.active {
-            animation: swipeGlide 1.5s ease-in-out forwards;
-        }
+      #preview {
+        margin: auto !important;
+        border: none;
+        background: transparent;
+        pointer-events: auto !important;
+        touch-action: none !important; /* Turn.js préfère gérer lui-même sans interférence navigateur */
+        user-select: none;
+        -webkit-user-drag: none;
+      }
 
-        @keyframes swipeGlide {
-            0% { transform: translateX(50px); opacity: 0; }
-            20% { opacity: 1; }
-            80% { transform: translateX(-80px); opacity: 1; }
-            100% { transform: translateX(-120px); opacity: 0; }
-        }
+      /* STATUS BADGE */
+      #status-badge {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        padding: 5px 15px;
+        border-radius: 15px;
+        font-size: 10px;
+        font-weight: bold;
+        background: #222;
+      }
 
-        /* ✅ CENTRAGE PAGES 3 & 5 (CITATIONS / RAPPELS) */
-        #flipbook .p3 .page-content,
-        #flipbook .p5 .page-content {
-            display: flex !important;
-            flex-direction: column !important;
-            justify-content: center !important;
-            align-items: center !important;
-            text-align: center !important;
-            height: 100% !important;
-        }
+      /* SWIPE HINT V4 (ASSET OFFICIEL) */
+      #swipe-hint {
+        position: absolute;
+        bottom: 20px;
+        right: 20px;
+        width: 100px;
+        height: 100px;
+        z-index: 200;
+        pointer-events: none;
+        opacity: 0;
+        background: url("./assets/swipe-left.png") no-repeat center;
+        background-size: contain;
+        filter: drop-shadow(0 5px 15px rgba(0, 0, 0, 0.3));
+      }
+      #swipe-hint.active {
+        animation: swipeGlide 1.5s ease-in-out forwards;
+      }
 
-        /* ✅ UX: ZONES DE TAP INVISIBLES (BORDURES) */
-        #tap-prev, #tap-next {
-            position: absolute;
-            top: 0;
-            bottom: 0;
-            width: 25%;
-            z-index: 300;
-            cursor: pointer;
-            pointer-events: auto;
-            -webkit-tap-highlight-color: transparent;
-            background: rgba(255, 0, 0, 0); /* Invisible mais capte les clics */
+      @keyframes swipeGlide {
+        0% {
+          transform: translateX(50px);
+          opacity: 0;
         }
-        #tap-prev { left: 0; }
-        #tap-next { right: 0; }
+        20% {
+          opacity: 1;
+        }
+        80% {
+          transform: translateX(-80px);
+          opacity: 1;
+        }
+        100% {
+          transform: translateX(-120px);
+          opacity: 0;
+        }
+      }
 
-        /* ✅ iOS BUG FIX: EDGE GUARDS (Prevents "Back" gesture) */
-        #edge-guard-left, #edge-guard-right {
-            position: absolute;
-            top: 0;
-            bottom: 0;
-            width: 22px;
-            z-index: 400; /* Above everything */
-            background: transparent;
-            pointer-events: auto;
-            touch-action: pan-y;
-        }
-        #edge-guard-left { left: 0; }
-        #edge-guard-right { right: 0; }
+      /* ✅ CENTRAGE PAGES 3 & 5 (CITATIONS / RAPPELS) */
+      #flipbook .p3 .page-content,
+      #flipbook .p5 .page-content {
+        display: flex !important;
+        flex-direction: column !important;
+        justify-content: center !important;
+        align-items: center !important;
+        text-align: center !important;
+        height: 100% !important;
+      }
 
-        /* ✅ OPTIMIZATION LANDSCAPE (844x390 & 740x360) */
-        @media (orientation: landscape) and (max-height: 450px) {
-            header { display: none !important; }
-            body { padding: 5px !important; justify-content: flex-start !important; }
-            .presets { margin-bottom: 5px !important; }
-        }
+      /* ✅ UX: ZONES DE TAP INVISIBLES (BORDURES) */
+      #tap-prev,
+      #tap-next {
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        width: 25%;
+        z-index: 300;
+        cursor: pointer;
+        pointer-events: auto;
+        -webkit-tap-highlight-color: transparent;
+        background: rgba(255, 0, 0, 0); /* Invisible mais capte les clics */
+      }
+      #tap-prev {
+        left: 0;
+      }
+      #tap-next {
+        right: 0;
+      }
 
-        /* Target 844x390 */
-        @media (orientation: landscape) and (width: 844px) and (height: 390px) {
-            .device-frame { transform: scale(0.85); transform-origin: top center; margin-bottom: -60px; }
-        }
+      /* ✅ iOS BUG FIX: EDGE GUARDS (Prevents "Back" gesture) */
+      #edge-guard-left,
+      #edge-guard-right {
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        width: 22px;
+        z-index: 400; /* Above everything */
+        background: transparent;
+        pointer-events: auto;
+        touch-action: pan-y;
+      }
+      #edge-guard-left {
+        left: 0;
+      }
+      #edge-guard-right {
+        right: 0;
+      }
 
-        /* Target 740x360 */
-        @media (orientation: landscape) and (width: 740px) and (height: 360px) {
-            .device-frame { transform: scale(0.72); transform-origin: top center; margin-bottom: -110px; }
+      /* ✅ OPTIMIZATION LANDSCAPE (844x390 & 740x360) */
+      @media (orientation: landscape) and (max-height: 450px) {
+        header {
+          display: none !important;
         }
+        body {
+          padding: 5px !important;
+          justify-content: flex-start !important;
+        }
+        .presets {
+          margin-bottom: 5px !important;
+        }
+      }
+
+      /* Target 844x390 */
+      @media (orientation: landscape) and (width: 844px) and (height: 390px) {
+        .device-frame {
+          transform: scale(0.85);
+          transform-origin: top center;
+          margin-bottom: -60px;
+        }
+      }
+
+      /* Target 740x360 */
+      @media (orientation: landscape) and (width: 740px) and (height: 360px) {
+        .device-frame {
+          transform: scale(0.72);
+          transform-origin: top center;
+          margin-bottom: -110px;
+        }
+      }
     </style>
-</head>
-<body>
+  </head>
+  <body>
     <div id="status-badge">INITIALIZING...</div>
-    
+
     <header>
-        <h1>Virtual Device Lab</h1>
-        <div class="stats" id="device-info">iPhone SE | 375x667</div>
+      <h1>Virtual Device Lab</h1>
+      <div class="stats" id="device-info">iPhone SE | 375x667</div>
     </header>
 
     <div class="presets">
-        <button class="btn-preset active" onclick="setDevice(375, 667, 'iPhone SE')">iPhone SE</button>
-        <button class="btn-preset" onclick="setDevice(390, 844, 'iPhone 13/14')">iPhone 13/14</button>
-        <button class="btn-preset" onclick="setDevice(430, 932, 'iPhone Pro Max')">iPhone Pro Max</button>
-        <button class="btn-preset" onclick="setDevice(360, 740, 'Android Small')">Android Small</button>
-        <button class="btn-preset" onclick="setDevice(412, 915, 'Android Tall')">Android Tall</button>
-        <button class="btn-preset" onclick="setDevice(844, 390, 'iPhone 13 Landscape')">Land (844x390)</button>
-        <button class="btn-preset" onclick="setDevice(740, 360, 'Android Landscape')">Land (740x360)</button>
+      <button
+        class="btn-preset active"
+        onclick="setDevice(375, 667, 'iPhone SE')"
+      >
+        iPhone SE
+      </button>
+      <button class="btn-preset" onclick="setDevice(390, 844, 'iPhone 13/14')">
+        iPhone 13/14
+      </button>
+      <button
+        class="btn-preset"
+        onclick="setDevice(430, 932, 'iPhone Pro Max')"
+      >
+        iPhone Pro Max
+      </button>
+      <button class="btn-preset" onclick="setDevice(360, 740, 'Android Small')">
+        Android Small
+      </button>
+      <button class="btn-preset" onclick="setDevice(412, 915, 'Android Tall')">
+        Android Tall
+      </button>
+      <button
+        class="btn-preset"
+        onclick="setDevice(844, 390, 'iPhone 13 Landscape')"
+      >
+        Land (844x390)
+      </button>
+      <button
+        class="btn-preset"
+        onclick="setDevice(740, 360, 'Android Landscape')"
+      >
+        Land (740x360)
+      </button>
     </div>
 
-    <div class="device-frame" id="frame" style="overflow: hidden;">
-        <div id="preview-container">
-            <!-- UNE SEULE IFRAME - FLIPBOOK PUR SANS INJECTION -->
-            <iframe id="preview" src="./ebook_flipbook.backup.html"></iframe>
-            <!-- Zones de tap invisibles -->
-            <div id="tap-prev" aria-label="Page précédente"></div>
-            <div id="tap-next" aria-label="Page suivante"></div>
-            <!-- Edge Guards (iOS Back fix) -->
-            <div id="edge-guard-left"></div>
-            <div id="edge-guard-right"></div>
-        </div>
+    <div class="device-frame" id="frame" style="overflow: hidden">
+      <div id="preview-container">
+        <!-- UNE SEULE IFRAME - FLIPBOOK PUR SANS INJECTION -->
+        <iframe id="preview" src="./ebook_flipbook.backup.html"></iframe>
+        <!-- Zones de tap invisibles -->
+        <div id="tap-prev" aria-label="Page précédente"></div>
+        <div id="tap-next" aria-label="Page suivante"></div>
+        <!-- Edge Guards (iOS Back fix) -->
+        <div id="edge-guard-left"></div>
+        <div id="edge-guard-right"></div>
+      </div>
 
-        <!-- SWIPE HINT overlay (non bloquant) -->
-        <div id="swipe-hint" aria-hidden="true"></div>
-        
-        <!-- BARRIÈRE DE SÉCURITÉ (Bloque Turn.js navigation - Fond transparent pour éviter la barre blanche) -->
-        <div id="btn-mask" style="display:none !important;"></div>
+      <!-- SWIPE HINT overlay (non bloquant) -->
+      <div id="swipe-hint" aria-hidden="true"></div>
+
+      <!-- BARRIÈRE DE SÉCURITÉ (Bloque Turn.js navigation - Fond transparent pour éviter la barre blanche) -->
+      <div id="btn-mask" style="display: none !important"></div>
     </div>
 
     <!-- BLOC OBSOLÈTE SUPPRIMÉ -->
 
     <script>
-        const ACTIVE_FLIPBOOK_SRC = "./ebook_flipbook.backup.html"; // Option A
-        const params = new URLSearchParams(window.location.search);
-        let currentW = parseInt(params.get('w')) || 375;
-        let currentH = parseInt(params.get('h')) || 667;
-        let currentName = params.get('name') || "iPhone SE";
-        function setDevice(w, h, name) {
-            currentW = w; currentH = h; currentName = name;
-            updateUI();
-        }
+      const ACTIVE_FLIPBOOK_SRC = "./ebook_flipbook.backup.html"; // Option A
+      const params = new URLSearchParams(window.location.search);
+      let currentW = parseInt(params.get("w")) || 375;
+      let currentH = parseInt(params.get("h")) || 667;
+      let currentName = params.get("name") || "iPhone SE";
+      function setDevice(w, h, name) {
+        currentW = w;
+        currentH = h;
+        currentName = name;
+        updateUI();
+      }
 
-        function updateUI() {
-            const w = currentW; const h = currentH; const name = currentName;
-            document.getElementById('device-info').innerText = `${name} | ${w}x${h}`;
-            
-            const frame = document.getElementById('frame');
-            frame.style.width = w + "px";
-            frame.style.height = h + "px";
+      function updateUI() {
+        const w = currentW;
+        const h = currentH;
+        const name = currentName;
+        document.getElementById("device-info").innerText =
+          `${name} | ${w}x${h}`;
 
-            const iframe = document.getElementById('preview');
-            // Retrait de l'opacité 0 qui causait l'écran noir sur changement de preset
-            iframe.width = w;
-            iframe.height = h;
+        const frame = document.getElementById("frame");
+        frame.style.width = w + "px";
+        frame.style.height = h + "px";
 
-            const cleanIframe = () => {
-                try {
-                    // Les styles et scripts responsives sont désormais 
-                    // directement dans ebook_flipbook.backup.html
-                    // pour éviter les blocages CORS.
-                    
-                    // Restaurer le Swipe (Déblocage Masque)
-                    const mask = document.getElementById('btn-mask');
-                    if (mask) mask.style.pointerEvents = "none";
+        const iframe = document.getElementById("preview");
+        // ✅ Fix: Aligner l'iframe sur l'espace interne réel (sans bordures de frame)
+        iframe.width = frame.clientWidth;
+        iframe.height = frame.clientHeight;
 
-                    // Révélation immédiate si nécessaire
-                    iframe.style.opacity = "1";
+        const cleanIframe = () => {
+          try {
+            // Les styles et scripts responsives sont désormais
+            // directement dans ebook_flipbook.backup.html
+            // pour éviter les blocages CORS.
 
-                    // ✅ QA: boost images only on pages 2/4/6/7 (injection dans l'iframe)
-                    const doc = iframe.contentDocument;
-                    if (doc && !doc.getElementById("qa-img-boost")) {
-                        const style = doc.createElement("style");
-                        style.id = "qa-img-boost";
-                        style.textContent = `
+            // Restaurer le Swipe (Déblocage Masque)
+            const mask = document.getElementById("btn-mask");
+            if (mask) mask.style.pointerEvents = "none";
+
+            // Révélation immédiate si nécessaire
+            iframe.style.opacity = "1";
+
+            // ✅ QA: boost images only on pages 2/4/6/7 (injection dans l'iframe)
+            const doc = iframe.contentDocument;
+            if (doc && !doc.getElementById("qa-img-boost")) {
+              const style = doc.createElement("style");
+              style.id = "qa-img-boost";
+              style.textContent = `
                             /* Targets: page 2/4/6/7 images only via Turn.js stable classes */
                             #flipbook .p2 .page-content img,
                             #flipbook .p4 .page-content img,
@@ -260,177 +386,224 @@
                                 }
                             }
                         `;
-                        doc.head.appendChild(style);
-                    }
-                } catch(e) { iframe.style.opacity = "1"; }
-            };
-
-            iframe.onload = cleanIframe;
-
-           // Initialisation de la source
-            iframe.src = ACTIVE_FLIPBOOK_SRC;
-
-            // PATCH DE FOCUS POUR TURN.JS (WRAPPER ONLY)
-            // Garantit que l'iframe reçoit les événements dès le premier toucher/clic
-            const pCont = document.getElementById('preview-container');
-            if (pCont) {
-                pCont.addEventListener('mousedown', () => iframe.focus(), true);
-                pCont.addEventListener('touchstart', () => iframe.focus(), {passive: true, capture: true});
+              doc.head.appendChild(style);
             }
-            cleanIframe(); // Appeler cleanIframe immédiatement au cas où l'iframe est déjà chargée (ex: premier chargement)
+          } catch (e) {
+            iframe.style.opacity = "1";
+          }
+        };
 
-            document.querySelectorAll('.btn-preset').forEach(b => {
-                const active = (b.innerText === name || b.innerText.includes(w+"x"+h));
-                b.classList.toggle('active', active);
-            });
-            
-            document.getElementById('status-badge').innerText = "VIRTUAL LAB READY";
-            document.getElementById('status-badge').style.color = "#4caf50";
+        iframe.onload = () => {
+          cleanIframe();
+          setTimeout(applyDisplayMode, 100);
+        };
 
-            // LOGIQUE SWIPE HINT V4 (SESSION UNIQUE)
-            function showSwipeHintOnce() {
-                const hint = document.getElementById('swipe-hint');
-                if (hint && sessionStorage.getItem('swipeHintShown') !== "1") {
-                    setTimeout(() => {
-                        hint.classList.add('active');
-                        setTimeout(() => {
-                            hint.classList.remove('active');
-                            setTimeout(() => hint.remove(), 500); // Nettoyage DOM
-                            sessionStorage.setItem('swipeHintShown', '1');
-                        }, 1600); // Visibilité ~1.5s
-                    }, 1000); // Délai après chargement
-                } else if (hint) {
-                    hint.remove();
+        // Initialisation de la source
+        iframe.src = ACTIVE_FLIPBOOK_SRC;
+
+        // PATCH DE FOCUS POUR TURN.JS (WRAPPER ONLY)
+        // Garantit que l'iframe reçoit les événements dès le premier toucher/clic
+        const pCont = document.getElementById("preview-container");
+        if (pCont) {
+          pCont.addEventListener("mousedown", () => iframe.focus(), true);
+          pCont.addEventListener("touchstart", () => iframe.focus(), {
+            passive: true,
+            capture: true,
+          });
+        }
+        cleanIframe(); // Appeler cleanIframe immédiatement au cas où l'iframe est déjà chargée (ex: premier chargement)
+
+        document.querySelectorAll(".btn-preset").forEach((b) => {
+          const active =
+            b.innerText === name || b.innerText.includes(w + "x" + h);
+          b.classList.toggle("active", active);
+        });
+
+        document.getElementById("status-badge").innerText = "VIRTUAL LAB READY";
+        document.getElementById("status-badge").style.color = "#4caf50";
+
+        // LOGIQUE SWIPE HINT V4 (SESSION UNIQUE)
+        function showSwipeHintOnce() {
+          const hint = document.getElementById("swipe-hint");
+          if (hint && sessionStorage.getItem("swipeHintShown") !== "1") {
+            setTimeout(() => {
+              hint.classList.add("active");
+              setTimeout(() => {
+                hint.classList.remove("active");
+                setTimeout(() => hint.remove(), 500); // Nettoyage DOM
+                sessionStorage.setItem("swipeHintShown", "1");
+              }, 1600); // Visibilité ~1.5s
+            }, 1000); // Délai après chargement
+          } else if (hint) {
+            hint.remove();
+          }
+        }
+        showSwipeHintOnce();
+
+        // LOGIQUE UX: ZONES DE TAP (DÉLÉGATION)
+        document.getElementById("tap-prev").onclick = () => {
+          try {
+            iframe.contentWindow.$("#flipbook").turn("previous");
+          } catch (e) {}
+        };
+        document.getElementById("tap-next").onclick = () => {
+          try {
+            iframe.contentWindow.$("#flipbook").turn("next");
+          } catch (e) {}
+        };
+
+        // ✅ iOS BUG FIX: EDGE GUARDS
+        const preventBack = (e) => {
+          // If it's a clear horizontal move starting from the edge
+          if (e.cancelable) e.preventDefault();
+        };
+        const egl = document.getElementById("edge-guard-left");
+        const egr = document.getElementById("edge-guard-right");
+        egl.addEventListener("touchstart", (e) => iframe.focus(), {
+          passive: true,
+        });
+        egr.addEventListener("touchstart", (e) => iframe.focus(), {
+          passive: true,
+        });
+        // Crucial: non-passive listener to allow preventDefault
+        egl.addEventListener("touchmove", preventBack, { passive: false });
+        egr.addEventListener("touchmove", preventBack, { passive: false });
+
+        // ✅ LOGIQUE UX: SNAP NAVIGATION (AUTO-FINISH)
+        let touchStartX = 0,
+          touchStartY = 0,
+          touchStartTime = 0;
+        let lastSnapTime = 0;
+        const snapLockMs = 600;
+
+        const pContainer = document.getElementById("preview-container");
+        pContainer.addEventListener(
+          "touchstart",
+          (e) => {
+            touchStartX = e.touches[0].clientX;
+            touchStartY = e.touches[0].clientY;
+            touchStartTime = Date.now();
+          },
+          { passive: true },
+        );
+
+        pContainer.addEventListener(
+          "touchend",
+          (e) => {
+            const now = Date.now();
+            if (now - lastSnapTime < snapLockMs) return;
+
+            const dx = e.changedTouches[0].clientX - touchStartX;
+            const dy = e.changedTouches[0].clientY - touchStartY;
+            const dt = now - touchStartTime;
+            const width = iframe.offsetWidth || 375;
+
+            // Thresholds
+            const distThreshold = width * 0.35;
+            const velThreshold = 0.7; // px/ms
+            const velocity = Math.abs(dx / dt);
+
+            // Conditions: Horizontal dominant AND (Distance OR Velocity)
+            if (Math.abs(dx) > Math.abs(dy) * 1.5) {
+              if (Math.abs(dx) > distThreshold || velocity > velThreshold) {
+                if (dx < -30) {
+                  // Swipe Left -> Next
+                  try {
+                    iframe.contentWindow.$("#flipbook").turn("next");
+                    lastSnapTime = now;
+                  } catch (err) {}
+                } else if (dx > 30) {
+                  // Swipe Right -> Prev
+                  try {
+                    iframe.contentWindow.$("#flipbook").turn("previous");
+                    lastSnapTime = now;
+                  } catch (err) {}
                 }
+              }
             }
-            showSwipeHintOnce();
+          },
+          { passive: true },
+        );
 
-            // LOGIQUE UX: ZONES DE TAP (DÉLÉGATION)
-            document.getElementById('tap-prev').onclick = () => {
-                try { iframe.contentWindow.$('#flipbook').turn('previous'); } catch(e) {}
-            };
-            document.getElementById('tap-next').onclick = () => {
-                try { iframe.contentWindow.$('#flipbook').turn('next'); } catch(e) {}
-            };
+        // Premier appel après chargement de l'iframe
+        iframe.onload = () => {
+          cleanIframe();
+          setTimeout(applyDisplayMode, 100);
+        };
+      }
 
-            // ✅ iOS BUG FIX: EDGE GUARDS
-            const preventBack = (e) => {
-                // If it's a clear horizontal move starting from the edge
-                if (e.cancelable) e.preventDefault();
-            };
-            const egl = document.getElementById('edge-guard-left');
-            const egr = document.getElementById('edge-guard-right');
-            egl.addEventListener('touchstart', (e) => iframe.focus(), {passive: true});
-            egr.addEventListener('touchstart', (e) => iframe.focus(), {passive: true});
-            // Crucial: non-passive listener to allow preventDefault
-            egl.addEventListener('touchmove', preventBack, {passive: false});
-            egr.addEventListener('touchmove', preventBack, {passive: false});
+      // ✅ DOUBLE PAGE LANDSCAPE (BASCULE AUTO)
+      let displayLock = false;
+      let currentDisplay = "single";
 
-            // ✅ LOGIQUE UX: SNAP NAVIGATION (AUTO-FINISH)
-            let touchStartX = 0, touchStartY = 0, touchStartTime = 0;
-            let lastSnapTime = 0;
-            const snapLockMs = 600;
+      function applyDisplayMode() {
+        if (displayLock) return;
+        displayLock = true;
+        setTimeout(() => {
+          displayLock = false;
+        }, 300);
 
-            const pContainer = document.getElementById('preview-container');
-            pContainer.addEventListener('touchstart', (e) => {
-                touchStartX = e.touches[0].clientX;
-                touchStartY = e.touches[0].clientY;
-                touchStartTime = Date.now();
-            }, {passive: true});
+        // Détection orientation (basée sur la simulation PRESET)
+        const landscape = currentW > currentH;
+        const wantedMode = landscape ? "double" : "single";
 
-            pContainer.addEventListener('touchend', (e) => {
-                const now = Date.now();
-                if (now - lastSnapTime < snapLockMs) return;
-
-                const dx = e.changedTouches[0].clientX - touchStartX;
-                const dy = e.changedTouches[0].clientY - touchStartY;
-                const dt = now - touchStartTime;
-                const width = iframe.offsetWidth || 375;
-
-                // Thresholds
-                const distThreshold = width * 0.35;
-                const velThreshold = 0.7; // px/ms
-                const velocity = Math.abs(dx / dt);
-
-                // Conditions: Horizontal dominant AND (Distance OR Velocity)
-                if (Math.abs(dx) > Math.abs(dy) * 1.5) {
-                    if (Math.abs(dx) > distThreshold || velocity > velThreshold) {
-                        if (dx < -30) { // Swipe Left -> Next
-                            try { 
-                                iframe.contentWindow.$('#flipbook').turn('next'); 
-                                lastSnapTime = now;
-                            } catch(err) {}
-                        } else if (dx > 30) { // Swipe Right -> Prev
-                            try { 
-                                iframe.contentWindow.$('#flipbook').turn('previous'); 
-                                lastSnapTime = now;
-                            } catch(err) {}
-                        }
-                    }
-                }
-            }, {passive: true});
-
-            // ✅ DOUBLE PAGE LANDSCAPE (BASCULE AUTO)
-            let displayLock = false;
-            let currentDisplay = 'single';
-
-            function applyDisplayMode() {
-                if (displayLock) return;
-                displayLock = true;
-                setTimeout(() => { displayLock = false; }, 300);
-
-                // Détection orientation (robuste, double garde)
-                const landscape = window.matchMedia("(orientation: landscape)").matches
-                                  || (currentW > currentH);
-                const wantedMode = landscape ? 'double' : 'single';
-
-                if (wantedMode === currentDisplay) return;
-
-                // Accès fail-safe à Turn.js dans l'iframe
-                try {
-                    const f = document.getElementById('preview');
-                    const w = f?.contentWindow;
-                    const $ = w?.$;
-                    if (!$ || !$('#flipbook').length || typeof $('#flipbook').turn !== 'function') {
-                        console.warn('[display] Turn.js inaccessible, reste en', currentDisplay);
-                        return;
-                    }
-                    const $book = $('#flipbook');
-                    $book.turn('display', wantedMode);
-                    currentDisplay = wantedMode;
-
-                    // Resize après bascule
-                    const fw = f.offsetWidth || currentW;
-                    const fh = f.offsetHeight || currentH;
-                    try { $book.turn('size', fw, fh); } catch(e) {
-                        try { $book.turn('resize'); } catch(e2) {}
-                    }
-
-                    console.log('[display]', currentDisplay, '(landscape=' + landscape + ')');
-                } catch(err) {
-                    console.warn('[display] Fail-safe: reste en', currentDisplay, err.message);
-                }
-            }
-
-            // Écouter les changements d'orientation/résolution
-            let resizeTimer = null;
-            window.addEventListener('resize', () => {
-                clearTimeout(resizeTimer);
-                resizeTimer = setTimeout(applyDisplayMode, 150);
-            });
-            window.addEventListener('orientationchange', () => {
-                setTimeout(applyDisplayMode, 200);
-            });
-
-            // Premier appel après chargement de l'iframe
-            iframe.addEventListener('load', () => {
-                setTimeout(applyDisplayMode, 100);
-            });
+        if (wantedMode === currentDisplay) {
+          // Même si le mode n'a pas changé, on force un resize au cas où les dimensions ont bougé
+          resizeBook();
+          return;
         }
 
-        // NETTOYAGE TERMINÉ - MODE FLIPBOOK PUR UNIQUEMENT
+        // Accès fail-safe à Turn.js dans l'iframe
+        try {
+          const f = document.getElementById("preview");
+          const w = f?.contentWindow;
+          const $ = w?.$;
+          if (
+            !$ ||
+            !$("#flipbook").length ||
+            typeof $("#flipbook").turn !== "function"
+          ) {
+            return;
+          }
+          const $book = $("#flipbook");
+          $book.turn("display", wantedMode);
+          currentDisplay = wantedMode;
 
-        updateUI();
+          resizeBook();
+          console.log(
+            "[display]",
+            currentDisplay,
+            "(landscape-simulated=" + landscape + ")",
+          );
+        } catch (err) {
+          console.warn("[display] Fail-safe:", err.message);
+        }
+      }
+
+      function resizeBook() {
+        try {
+          const f = document.getElementById("preview");
+          const $book = f.contentWindow.$("#flipbook");
+          // ✅ Utiliser offsetWidth de l'iframe (taille réelle après rendu)
+          const fw = f.offsetWidth;
+          const fh = f.offsetHeight;
+          $book.turn("size", fw, fh);
+        } catch (e) {}
+      }
+
+      // Écouter les changements d'orientation/résolution (HORS updateUI)
+      let resizeTimer = null;
+      window.addEventListener("resize", () => {
+        clearTimeout(resizeTimer);
+        resizeTimer = setTimeout(applyDisplayMode, 150);
+      });
+      window.addEventListener("orientationchange", () => {
+        setTimeout(applyDisplayMode, 200);
+      });
+
+      // NETTOYAGE TERMINÉ - MODE FLIPBOOK PUR UNIQUEMENT
+
+      updateUI();
     </script>
-</body>
+  </body>
 </html>
