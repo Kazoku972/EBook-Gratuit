@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>On est ensemble, Maman - Version Flipbook</title>
+    <!-- On utilise turn.js via CDN pour la démo, mais on privilégie l'offline-first en prod -->
+    <script src="js/jquery.min.js"></script>
+    <script src="js/turn.min.js"></script>
+    <link rel="stylesheet" href="ebook_interactif.css">
+</head>
+<body style="background: #f0f0f0;">
+
+<div id="flipbook-viewport">
+    <div id="flipbook">
+        
+        <!-- COUVERTURE -->
+        <div class="flip-page hard">
+            <div class="page-content" style="background-color: var(--color-sable);">
+                <img src="images/couverture.png" alt="Couverture" class="hero-img" style="max-height: 480px;">
+                <h1>On est ensemble, Maman</h1>
+                <p style="font-style: italic; color: var(--color-sauge);">Douceur et Lumière au Quotidien</p>
+            </div>
+        </div>
+
+        <!-- PAGE 2: AVANT-PROPOS -->
+        <div class="flip-page">
+            <div class="page-content">
+                <h2>Avant-propos</h2>
+                <img src="images/Scène Réveil Matin Chaotique.png" alt="Matin">
+                <p>Imagine une lumière matinale, douce et dorée... l’odeur du café qui infuse... et cette sensation que tout va un peu trop vite.</p>
+                <p>Moi, c'est <strong>Marine</strong>. Je vis ce "chaos joyeux" chaque jour avec <strong>Kaïto</strong> (4 ans) et <strong>Yuna</strong> (2 ans).</p>
+            </div>
+        </div>
+
+        <!-- PAGE 3: CITATION -->
+        <div class="flip-page">
+            <div class="page-content" style="justify-content: center;">
+                <div class="quote">"Tu n'es pas seule. Et tu n'as pas à porter ce poids toute seule."</div>
+                <p style="text-align: center; color: var(--color-sauge);">— On est ensemble, Maman</p>
+            </div>
+        </div>
+
+        <!-- PAGE 4: CHAPITRE 1 -->
+        <div class="flip-page">
+            <div class="page-content">
+                <h2>1. Le Miroir de la Guerrière</h2>
+                <p>Devenir maman, c'est voir un paysage transformé par un tsunami. Porter la vie est une force de guerrière cachée sous une peau fatiguée.</p>
+                <img src="images/Illustration 1.1 - La remise en perspective (La guerrière).png" alt="Guerrière">
+                <p style="font-style: italic; font-size: 0.9rem;">"Être vulnérable aujourd'hui, ce n'est pas être faible. C'est être vivante."</p>
+            </div>
+        </div>
+
+        <!-- PAGE 5: RAPPEL -->
+        <div class="flip-page">
+            <div class="page-content" style="justify-content: center;">
+                <div class="alert-box">
+                    <strong>À retenir</strong>
+                    Ta fatigue est le témoin de tout l'amour que tu diffuses. Elle mérite d'être honorée, pas jugée.
+                </div>
+            </div>
+        </div>
+
+        <!-- PAGE 6: EXERCICE -->
+        <div class="flip-page">
+            <div class="page-content">
+                <h2 style="font-size: 1.5rem;">🌟 L'Équilibre dans le Chaos</h2>
+                <p>La vraie vie a des couleurs vibrantes : le bleu de la peinture, le rose des joues, le beige du désordre.</p>
+                <img src="images/Illustration 6.1 - Le miroir bienveillant (Auto-affirmation).png" alt="Miroir">
+                <div style="font-style: italic; margin-top: 10px; font-size: 0.9rem;"><strong>Pacte de Lumière :</strong> "Je m'autorise à être une femme imparfaite et une maman aimante."</div>
+            </div>
+        </div>
+
+        <!-- PAGE 7: CONCLUSION -->
+        <div class="flip-page">
+            <div class="page-content" style="text-align: center; justify-content: center;">
+                <img src="images/Scène Coucher Tendre.png" alt="Coucher">
+                <h2 style="font-size: 1.2rem;">On est ensemble</h2>
+                <p style="font-size: 0.85rem;">Ce guide est une petite lampe de chevet pour tes nuits trop courtes. Tu n'as pas à briller seule.</p>
+                <p style="font-family: cursive; color: var(--color-rose); font-size: 1.3rem; margin-top: 0.5rem;">Marine 💕</p>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+
+<script>
+    $(window).ready(function() {
+        var flipbook = $('#flipbook');
+
+        // Initialisation Turn.js optimisée pour le swipe mobile
+        flipbook.turn({
+            display: 'single',
+            width: window.innerWidth,
+            height: window.innerHeight,
+            autoCenter: true,
+            gradients: true,
+            acceleration: true,
+            elevation: 50,
+            duration: 1000,
+            when: {
+                turned: function(e, page) {
+                    console.log('Page actuelle :', page);
+                }
+            }
+        });
+
+        // Gestion du redimensionnement dynamique
+        $(window).resize(function() {
+            flipbook.turn('size', window.innerWidth, window.innerHeight);
+        });
+
+        // Navigation clavier (confort desktop)
+        $(window).bind('keydown', function(e) {
+            if (e.keyCode === 37) {
+                flipbook.turn('previous');
+            } else if (e.keyCode === 39) {
+                flipbook.turn('next');
+            }
+        });
+    });
+</script>
+
+</body>
+</html>

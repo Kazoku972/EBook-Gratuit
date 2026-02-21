@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>On est ensemble, Maman - Story Mode</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,400;0,700;1,400&family=Playfair+Display:ital,wght@0,700;1,700&display=swap" rel="stylesheet">
+    <script src="js/jquery.min.js"></script>
+    <script src="js/turn.min.js"></script>
+    <link rel="stylesheet" href="css/story.css">
+    <link rel="stylesheet" href="css/ebook_interactif.css">
+</head>
+<body>
+
+<style>
+    /* MISSION UNIQUE : FULL-FIT / NO-CROP (STRATÉGIE MASTER SCALE V2) */
+    html, body {
+        margin: 0;
+        padding: 0;
+        width: 100%;
+        height: 100%;
+        height: 100dvh;
+        overflow: hidden !important;
+        position: fixed;
+        background-color: #000; /* Fond noir profond */
+        display: grid;
+        place-items: center; /* Centrage Grid ultra-robuste */
+    }
+    
+    #flipbook-viewport {
+        position: relative;
+        width: 100%;
+        height: 100%;
+        display: grid;
+        grid-template-rows: 1fr !important; /* Force flexible row for centering */
+        place-items: center;
+        overflow: hidden !important;
+    }
+
+    #flipbook {
+        /* On retire les transitions CSS sur le flipbook pour ne pas interférer avec Turn.js */
+        transform-origin: center center;
+        transition: transform 0.1s ease-out;
+        margin: 0 !important;
+        visibility: hidden; /* Caché jusqu'au premier resize() pour éviter le jump */
+    }
+
+    .flip-page:not(.page-1), 
+    .flip-page:not(.page-1) .page-content {
+        background-color: #F9F7F2 !important; /* Sable pour tout sauf couv */
+    }
+
+    .flip-page, 
+    .flip-page .page-content {
+        width: 480px !important;
+        height: 720px !important;
+        position: relative !important;
+        overflow: hidden !important;
+    }
+
+    /* STYLE UNIFIÉ - DESIGN EBOOK GRATUIT */
+    .page-content {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        padding: 24px !important;
+        box-sizing: border-box;
+        text-align: center;
+        font-family: 'Plus Jakarta Sans', sans-serif;
+        color: #5D5D5D; /* Gris Doux */
+    }
+
+    .page-content img {
+        max-width: 100%;
+        max-height: 50% !important;
+        object-fit: contain;
+        margin: 15px 0;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+        border: 2px solid #FFFFFF; /* Bordure "Photo papier" */
+        border-radius: 16px;
+        position: relative !important; /* Reset position absolute de la couverture */
+        top: auto !important;
+        left: auto !important;
+        width: auto !important;
+        height: auto !important;
+    }
+
+    .page-overlay, .quote, .alert-box {
+        width: 100% !important;
+        display: block !important;
+        z-index: 5000 !important;
+        box-sizing: border-box;
+        margin-top: auto; 
+    }
+
+    .flip-page:not(.page-1) .page-overlay {
+        position: relative !important; 
+        bottom: 0 !important;
+        background: transparent !important;
+        padding: 0 !important;
+        border: none !important;
+        box-shadow: none !important;
+        z-index: 5 !important;
+    }
+
+    .flip-page:not(.page-1) .page-overlay h1, 
+    .flip-page:not(.page-1) .page-overlay h2 {
+        font-family: 'Playfair Display', serif;
+        margin: 10px 0;
+        color: #E8A3A8 !important; /* Rose Poudré */
+        text-shadow: none !important; /* Pas de glow sur le contenu */
+        animation: none !important;
+        text-transform: none;
+        letter-spacing: normal;
+        font-size: clamp(24px, 5vw, 32px);
+    }
+
+    .page-overlay p {
+        font-size: clamp(14px, 4vw, 18px);
+        line-height: 1.6;
+        margin: 10px 0;
+    }
+
+    .quote {
+        font-family: 'Playfair Display', serif;
+        font-style: italic;
+        font-size: clamp(22px, 6vw, 30px);
+        color: #E8A3A8 !important;
+        border: none !important;
+        background: transparent !important;
+        padding: 40px 20px !important;
+        position: relative;
+    }
+
+    .quote::before {
+        content: "“";
+        font-size: 80px;
+        color: rgba(232, 163, 168, 0.2);
+        position: absolute;
+        top: -10px;
+        left: 50%;
+        transform: translateX(-50%);
+    }
+
+    .alert-box {
+        background: #FFFFFF !important; /* Fond carte blanche */
+        border: none !important;
+        border-left: 4px solid #B7C6B0 !important; /* Bordure Sauge */
+        border-radius: 24px;
+        padding: 24px !important;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+        text-align: left;
+    }
+
+    .alert-box h2 {
+        font-family: 'Plus Jakarta Sans', sans-serif;
+        color: #B7C6B0 !important; /* Sauge */
+        font-size: 18px;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        margin-bottom: 10px;
+    }
+
+    /* NAVIGATION RADICALE V2 - BOUTONS DIRECTS FIXED */
+    .btn-nav {
+        position: fixed !important;
+        bottom: env(safe-area-inset-bottom, 25px) !important;
+        z-index: 20000 !important; /* Au-dessus de TOUT */
+        background: #fff !important;
+        color: #000 !important;
+        width: 50px !important;
+        height: 50px !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        border-radius: 50% !important;
+        border: 3px solid #000 !important;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.5) !important;
+        cursor: pointer !important;
+        font-size: 20px !important;
+        font-weight: bold !important;
+        -webkit-backdrop-filter: blur(5px);
+        backdrop-filter: blur(5px);
+        text-decoration: none !important;
+        pointer-events: auto !important;
+    }
+
+    #prev-btn { left: 20px !important; }
+    #next-btn { right: 20px !important; }
+
+    /* CYCLE 2 - DESIGN COUVERTURE PREMIUM */
+    .page-1,
+    .page-1 .page-content {
+        padding: 0 !important; /* Full bleed total */
+        background: #000 !important;
+        margin: 0 !important;
+    }
+    .page-1 img {
+        position: absolute !important;
+        top: 0 !important;
+        left: 0 !important;
+        width: 100% !important;
+        height: 100% !important;
+        object-fit: cover !important; /* Immersif total */
+        margin: 0 !important;
+        padding: 0 !important;
+        box-shadow: none !important;
+        border-radius: 0 !important;
+        z-index: 1 !important;
+    }
+    .page-1 .page-overlay {
+        z-index: 10 !important;
+        bottom: 100px !important;
+        background: linear-gradient(transparent, rgba(0,0,0,0.8) 20%, rgba(0,0,0,0.9) 100%) !important;
+        border: none !important;
+        padding: 40px 10px !important;
+    }
+    .page-1 .page-overlay h1 {
+        color: #fff !important;
+        text-shadow: 0 0 20px rgba(233, 30, 99, 0.8);
+        font-size: 28px !important;
+        letter-spacing: 3px !important;
+        animation: pulse-glow 3s infinite ease-in-out;
+    }
+
+    @keyframes pulse-glow {
+        0% { text-shadow: 0 0 10px rgba(233, 30, 99, 0.5); }
+        50% { text-shadow: 0 0 30px rgba(233, 30, 99, 1); }
+        100% { text-shadow: 0 0 10px rgba(233, 30, 99, 0.5); }
+    }
+</style>
+
+<div id="flipbook-viewport">
+    <div id="flipbook">
+        <!-- COUVERTURE -->
+        <div class="flip-page hard page-1">
+            <div class="page-content">
+                <img src="images/couverture.png" alt="Couverture">
+                <div class="page-overlay">
+                    <h1>On est ensemble, Maman</h1>
+                </div>
+            </div>
+        </div>
+        <!-- PAGE 2 -->
+        <div class="flip-page">
+            <div class="page-content">
+                <img src="images/Scène Réveil Matin Chaotique.png" alt="Matin">
+                <div class="page-overlay">
+                    <h2>Avant-propos</h2>
+                </div>
+            </div>
+        </div>
+        <!-- PAGE 3 -->
+        <div class="flip-page">
+            <div class="page-content">
+                <div class="quote">"Tu n'es pas seule."</div>
+            </div>
+        </div>
+        <!-- PAGE 4 -->
+        <div class="flip-page">
+            <div class="page-content">
+                <img src="images/Illustration 1.1 - La remise en perspective (La guerrière).png" alt="Guerrière">
+                <div class="page-overlay">
+                    <h2>1. La Guerrière</h2>
+                </div>
+            </div>
+        </div>
+        <!-- PAGE 5 -->
+        <div class="flip-page">
+            <div class="page-content">
+                <div class="alert-box">
+                    <h2>À retenir</h2>
+                    <p>Maman, on est ensemble.</p>
+                </div>
+            </div>
+        </div>
+        <!-- PAGE 6 -->
+        <div class="flip-page">
+            <div class="page-content">
+                <img src="images/Illustration 6.1 - Le miroir bienveillant (Auto-affirmation).png" alt="Miroir">
+                <div class="page-overlay">
+                    <h2>🌟 Équilibre</h2>
+                </div>
+            </div>
+        </div>
+        <!-- PAGE 7 -->
+        <div class="flip-page conclusion">
+            <div class="page-content">
+                <img src="images/Scène Coucher Tendre.png" alt="Coucher">
+                <div class="page-overlay">
+                    <h2>Marine 💕</h2>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="prev-btn" class="btn-nav">←</div>
+<div id="next-btn" class="btn-nav">→</div>
+
+<script>
+    $(document).ready(function() {
+        var flipbook = $('#flipbook');
+        
+        // TAILLES DE RÉFÉRENCE (STRATÉGIE MASTER SCALE)
+        var pageW = 480;
+        var pageH = 720;
+        
+        function resize() {
+            var winW = $(window).width();
+            var winH = $(window).height();
+            var isMobile = (winW < 900);
+            var display = isMobile ? 'single' : 'double';
+            
+            var targetW = isMobile ? pageW : pageW * 2;
+            var targetH = pageH;
+            
+            if (flipbook.turn('display') !== display) {
+                flipbook.turn('display', display);
+            }
+            
+            flipbook.turn('size', targetW, targetH);
+
+            // CALCUL DU SCALE V3 - FULL-FIT TOTAL
+            var scaleX = winW / targetW;
+            var scaleY = winH / targetH;
+            var scale = Math.min(scaleX, scaleY);
+            
+            flipbook.css({
+                'transform': 'scale(' + scale + ')',
+                'position': 'static',
+                'margin': '0',
+                'visibility': 'visible' // Révélé après le premier calcul
+            });
+        }
+
+        flipbook.turn({
+            width: pageW * 2,
+            height: pageH,
+            autoCenter: false, // Désactivé pour laisser le CSS Grid gérer le centrage
+            display: ($(window).width() < 900) ? 'single' : 'double',
+            acceleration: true,
+            gradients: true,
+            elevation: 50,
+            duration: 600
+        });
+
+        $(window).resize(resize);
+        resize();
+        setTimeout(resize, 200); // Patch iOS orientation change
+
+        // TOUCH HANDLING V3 - SENSIBILITÉ ACCRUE
+        var ts;
+        flipbook.on('touchstart', function(e) { 
+            ts = e.originalEvent.touches[0].pageX; 
+        });
+        flipbook.on('touchend', function(e) {
+            var te = e.originalEvent.changedTouches[0].pageX;
+            var diff = ts - te;
+            if (Math.abs(diff) > 30) { // Sensibilité de 30px au lieu de 50px
+                if (diff > 0) flipbook.turn('next');
+                else flipbook.turn('previous');
+            }
+        });
+
+        $('#prev-btn').click(function() { flipbook.turn('previous'); });
+        $('#next-btn').click(function() { flipbook.turn('next'); });
+    });
+
+    // ZOOM PREVENTION
+    document.addEventListener('touchstart', function(e) { 
+        if (e.touches.length > 1) e.preventDefault(); 
+    }, { passive: false });
+    
+    var lastTouchEnd = 0;
+    document.addEventListener('touchend', function(e) {
+        var now = (new Date()).getTime();
+        if (now - lastTouchEnd <= 300) e.preventDefault();
+        lastTouchEnd = now;
+    }, false);
+</script>
+
+</body>
+</html>

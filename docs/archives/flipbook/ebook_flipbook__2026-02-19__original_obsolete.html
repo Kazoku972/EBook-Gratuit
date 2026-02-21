@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>On est ensemble, Maman - Version Flipbook</title>
+    <!-- On utilise turn.js via CDN pour la démo, mais on privilégie l'offline-first en prod -->
+    <script src="js/jquery.min.js"></script>
+    <script src="js/turn.min.js"></script>
+    <link rel="stylesheet" href="ebook_interactif.css">
+</head>
+<body style="background: #f0f0f0;">
+
+<div id="flipbook-viewport">
+    <div id="flipbook">
+        
+        <!-- COUVERTURE -->
+        <div class="flip-page hard">
+            <div class="page-content" style="background-color: var(--color-sable);">
+                <img src="images/couverture.png" alt="Couverture" class="hero-img" style="max-height: 480px;">
+                <h1>On est ensemble, Maman</h1>
+                <p style="font-style: italic; color: var(--color-sauge);">Douceur et Lumière au Quotidien</p>
+            </div>
+        </div>
+
+        <!-- PAGE 2: AVANT-PROPOS -->
+        <div class="flip-page">
+            <div class="page-content">
+                <h2>Avant-propos</h2>
+                <img src="images/Scène Réveil Matin Chaotique.png" alt="Matin">
+                <p>Imagine une lumière matinale, douce et dorée... l’odeur du café qui infuse... et cette sensation que tout va un peu trop vite.</p>
+                <p>Moi, c'est <strong>Marine</strong>. Je vis ce "chaos joyeux" chaque jour avec <strong>Kaïto</strong> (4 ans) et <strong>Yuna</strong> (2 ans).</p>
+            </div>
+        </div>
+
+        <!-- PAGE 3: CITATION -->
+        <div class="flip-page">
+            <div class="page-content" style="justify-content: center;">
+                <div class="quote">"Tu n'es pas seule. Et tu n'as pas à porter ce poids toute seule."</div>
+                <p style="text-align: center; color: var(--color-sauge);">— On est ensemble, Maman</p>
+            </div>
+        </div>
+
+        <!-- PAGE 4: CHAPITRE 1 -->
+        <div class="flip-page">
+            <div class="page-content">
+                <h2>1. Le Miroir de la Guerrière</h2>
+                <p>Devenir maman, c'est voir un paysage transformé par un tsunami. Porter la vie est une force de guerrière cachée sous une peau fatiguée.</p>
+                <img src="images/Illustration 1.1 - La remise en perspective (La guerrière).png" alt="Guerrière">
+                <p style="font-style: italic; font-size: 0.9rem;">"Être vulnérable aujourd'hui, ce n'est pas être faible. C'est être vivante."</p>
+            </div>
+        </div>
+
+        <!-- PAGE 5: RAPPEL -->
+        <div class="flip-page">
+            <div class="page-content" style="justify-content: center;">
+                <div class="alert-box">
+                    <strong>À retenir</strong>
+                    Ta fatigue est le témoin de tout l'amour que tu diffuses. Elle mérite d'être honorée, pas jugée.
+                </div>
+            </div>
+        </div>
+
+        <!-- PAGE 6: EXERCICE -->
+        <div class="flip-page">
+            <div class="page-content">
+                <h2 style="font-size: 1.5rem;">🌟 L'Équilibre dans le Chaos</h2>
+                <p>La vraie vie a des couleurs vibrantes : le bleu de la peinture, le rose des joues, le beige du désordre.</p>
+                <img src="images/Illustration 6.1 - Le miroir bienveillant (Auto-affirmation).png" alt="Miroir">
+                <div style="font-style: italic; margin-top: 10px; font-size: 0.9rem;"><strong>Pacte de Lumière :</strong> "Je m'autorise à être une femme imparfaite et une maman aimante."</div>
+            </div>
+        </div>
+
+        <!-- PAGE 7: CONCLUSION -->
+        <div class="flip-page">
+            <div class="page-content" style="text-align: center; justify-content: center;">
+                <img src="images/Scène Coucher Tendre.png" alt="Coucher">
+                <h2 style="font-size: 1.2rem;">On est ensemble</h2>
+                <p style="font-size: 0.85rem;">Ce guide est une petite lampe de chevet pour tes nuits trop courtes. Tu n'as pas à briller seule.</p>
+                <p style="font-family: cursive; color: var(--color-rose); font-size: 1.3rem; margin-top: 0.5rem;">Marine 💕</p>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<div class="flip-controls">
+    <button id="prev-btn" class="btn-nav"><span>←</span> Précédent</button>
+    <button id="next-btn" class="btn-nav">Suivant <span>→</span></button>
+</div>
+
+<script>
+    $(window).ready(function() {
+        var flipbook = $('#flipbook');
+
+            function checkSize() {
+            var width = $(window).width();
+            var height = $(window).height();
+            
+            if (width < 250) width = $(window).innerWidth();
+
+            // Force mode single sous 900px (Mobile + Tablette)
+            var targetDisplay = (width < 900) ? 'single' : (flipbook.turn('page') === 1 ? 'single' : 'double');
+            
+            if (flipbook.turn('display') !== targetDisplay) {
+                flipbook.turn('display', targetDisplay);
+                // Ajuster la taille interne de turn.js
+                if (targetDisplay === 'single') {
+                    flipbook.turn('size', 500, 740);
+                } else {
+                    flipbook.turn('size', 1000, 740);
+                }
+            }
+
+            var bookWidth = (targetDisplay === 'single') ? 500 : 1000;
+            var bookHeight = 740;
+            var scale = 1;
+
+            var horizontalScale = (width - 60) / bookWidth;
+            var verticalScale = (height - 180) / bookHeight;
+            
+            scale = Math.min(horizontalScale, verticalScale);
+            if (scale > 1) scale = 1;
+            scale = Math.max(scale, 0.4);
+
+            flipbook.css({
+                'transform': 'scale(' + scale + ')',
+                'transform-origin': 'center center'
+            });
+        }
+
+        // Déterminer le mode initial AVANT l'init turn.js
+        var initialDisplay = ($(window).width() < 900) ? 'single' : 'single'; // On commence toujours en single pour la couverture
+
+        flipbook.turn({
+            width: 500,
+            height: 740,
+            autoCenter: true,
+            display: initialDisplay,
+            elevation: 50,
+            acceleration: true,
+            gradients: true,
+            duration: 800,
+            when: {
+                turning: function(e, page) {
+                    if (page === 1) {
+                        $('#prev-btn').css('opacity', '0.3').css('pointer-events', 'none');
+                    } else {
+                        $('#prev-btn').css('opacity', '1').css('pointer-events', 'auto');
+                    }
+                    
+                    if (page === $(this).turn('pages')) {
+                        $('#next-btn').css('opacity', '0.3').css('pointer-events', 'none');
+                    } else {
+                        $('#next-btn').css('opacity', '1').css('pointer-events', 'auto');
+                    }
+                },
+                turned: function(e, page) {
+                    // Toute la logique de mode est maintenant déportée dans checkSize()
+                    // pour éviter les conflits de redimensionnement/navigation.
+                    checkSize();
+                }
+            }
+        });
+
+        $(window).resize(function() {
+            checkSize();
+        });
+
+        // Initialisation propre
+        checkSize();
+
+        $('#prev-btn').click(function() {
+            flipbook.turn('previous');
+        });
+
+        $('#next-btn').click(function() {
+            flipbook.turn('next');
+        });
+
+        // Navigation clavier
+        $(window).bind('keydown', function(e) {
+            if (e.keyCode === 37) {
+                flipbook.turn('previous');
+            } else if (e.keyCode === 39) {
+                flipbook.turn('next');
+            }
+        });
+
+        // Navigation Swipe améliorée pour éviter les glissements parasites
+        var touchStartCoord = { x: -1, y: -1 };
+        
+        flipbook.on('touchstart', function(e) {
+            touchStartCoord.x = e.originalEvent.touches[0].pageX;
+            touchStartCoord.y = e.originalEvent.touches[0].pageY;
+        });
+
+        flipbook.on('touchend', function(e) {
+            var touchEndCoordX = e.originalEvent.changedTouches[0].pageX;
+            var touchEndCoordY = e.originalEvent.changedTouches[0].pageY;
+            
+            var diffX = touchEndCoordX - touchStartCoord.x;
+            var diffY = touchEndCoordY - touchStartCoord.y;
+
+            // Seuil de déclenchement plus précis
+            if (Math.abs(diffX) > 60 && Math.abs(diffY) < 120) {
+                if (diffX > 0) flipbook.turn('previous');
+                else flipbook.turn('next');
+            }
+        });
+    });
+</script>
+
+</body>
+</html>

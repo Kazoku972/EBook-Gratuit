@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Flipbook Template - Responsive</title>
+    
+    <!-- Design System -->
+    <link rel="stylesheet" href="css/style.css">
+    
+    <!-- Libraries -->
+    <script src="lib/jquery.min.js"></script>
+    <script src="lib/turn.min.js"></script>
+</head>
+<body>
+
+    <div id="flipbook">
+        
+        <!-- PAGE 1: COVER -->
+        <div class="hard flip-page">
+            <div class="page-content">
+                <h1>VOTRE TITRE</h1>
+                <p>Sous-titre ou description courte</p>
+                <!-- <img src="assets/cover.png" alt="Cover"> -->
+            </div>
+        </div>
+
+        <!-- PAGE 2: CONTENT -->
+        <div class="flip-page">
+            <div class="page-content">
+                <h2>Première Page</h2>
+                <p>Ceci est un exemple de contenu parfaitement fluide et adapté aux mobiles.</p>
+                <img src="https://via.placeholder.com/400x300" alt="Placeholder">
+                <p>Le moteur gère automatiquement la taille pour éviter les débordements.</p>
+            </div>
+        </div>
+
+        <!-- PAGE 3: CONTENT -->
+        <div class="flip-page">
+            <div class="page-content">
+                <h2>Deuxième Page</h2>
+                <p>Ajoutez autant de pages que nécessaire en dupliquant ces blocs.</p>
+            </div>
+        </div>
+
+        <!-- PAGE 4: BACK COVER -->
+        <div class="hard flip-page">
+            <div class="page-content" style="justify-content: center;">
+                <h2>FIN</h2>
+                <p>Merci de votre lecture !</p>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Flipbook Engine -->
+    <script src="js/flipbook.js"></script>
+
+</body>
+</html>

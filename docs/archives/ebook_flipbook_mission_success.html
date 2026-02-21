@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>On est ensemble, Maman - Story Mode</title>
+    <script src="js/jquery.min.js"></script>
+    <script src="js/turn.min.js"></script>
+    <link rel="stylesheet" href="css/story.css">
+    <link rel="stylesheet" href="css/ebook_interactif.css">
+</head>
+<body>
+
+<style>
+    /* MISSION UNIQUE : FULL-FIT / NO-CROP (STRATÉGIE MASTER SCALE) */
+    html, body {
+        margin: 0;
+        padding: 0;
+        width: 100%;
+        height: 100%;
+        height: 100dvh;
+        overflow: hidden !important;
+        position: fixed;
+        background-color: #1a1a1a; /* Fond neutre sombre */
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+    
+    #flipbook-viewport {
+        position: relative;
+        width: 100vw;
+        height: 100dvh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        overflow: hidden !important;
+    }
+
+    #flipbook {
+        /* On retire les transitions CSS sur le flipbook pour ne pas interférer avec Turn.js */
+        transform-origin: center center;
+        transition: transform 0.1s ease-out;
+        margin: 0 !important;
+    }
+
+    .flip-page {
+        background-color: #fff;
+    }
+
+    .page-content {
+        width: 100%;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        padding: 40px !important; /* Padding interne fixe */
+        box-sizing: border-box;
+        text-align: center;
+    }
+
+    .page-content img {
+        max-width: 100%;
+        max-height: 70%;
+        object-fit: contain;
+        margin-bottom: 20px;
+    }
+
+    .page-overlay {
+        width: 100%;
+    }
+
+    /* Masquer les bordures de Turn.js et forcer la propreté */
+    .turn-page {
+        background-color: #fff !important;
+    }
+
+    .flip-controls {
+        position: fixed;
+        bottom: 20px;
+        left: 0;
+        right: 0;
+        display: flex;
+        justify-content: center;
+        gap: 20px;
+        z-index: 1000;
+        pointer-events: none;
+    }
+
+    .btn-nav {
+        pointer-events: auto;
+        background: rgba(255,255,255,0.8);
+        padding: 10px 20px;
+        border-radius: 20px;
+        cursor: pointer;
+        font-weight: bold;
+    }
+</style>
+
+<div id="flipbook-viewport">
+    <div id="flipbook">
+        <!-- COUVERTURE -->
+        <div class="flip-page hard">
+            <div class="page-content">
+                <img src="images/couverture.png" alt="Couverture">
+                <div class="page-overlay">
+                    <h1>On est ensemble, Maman</h1>
+                </div>
+            </div>
+        </div>
+        <!-- PAGE 2 -->
+        <div class="flip-page">
+            <div class="page-content">
+                <img src="images/Scène Réveil Matin Chaotique.png" alt="Matin">
+                <div class="page-overlay">
+                    <h2>Avant-propos</h2>
+                </div>
+            </div>
+        </div>
+        <!-- PAGE 3 -->
+        <div class="flip-page">
+            <div class="page-content">
+                <div class="quote">"Tu n'es pas seule."</div>
+            </div>
+        </div>
+        <!-- PAGE 4 -->
+        <div class="flip-page">
+            <div class="page-content">
+                <img src="images/Illustration 1.1 - La remise en perspective (La guerrière).png" alt="Guerrière">
+                <div class="page-overlay">
+                    <h2>1. La Guerrière</h2>
+                </div>
+            </div>
+        </div>
+        <!-- PAGE 5 -->
+        <div class="flip-page">
+            <div class="page-content">
+                <div class="alert-box">
+                    <h2>À retenir</h2>
+                    <p>Maman, on est ensemble.</p>
+                </div>
+            </div>
+        </div>
+        <!-- PAGE 6 -->
+        <div class="flip-page">
+            <div class="page-content">
+                <img src="images/Illustration 6.1 - Le miroir bienveillant (Auto-affirmation).png" alt="Miroir">
+                <div class="page-overlay">
+                    <h2>🌟 Équilibre</h2>
+                </div>
+            </div>
+        </div>
+        <!-- PAGE 7 -->
+        <div class="flip-page conclusion">
+            <div class="page-content">
+                <img src="images/Scène Coucher Tendre.png" alt="Coucher">
+                <div class="page-overlay">
+                    <h2>Marine 💕</h2>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="flip-controls">
+    <div id="prev-btn" class="btn-nav">← Précédent</div>
+    <div id="next-btn" class="btn-nav">Suivant →</div>
+</div>
+
+<script>
+    $(document).ready(function() {
+        var flipbook = $('#flipbook');
+        
+        // TAILLES DE RÉFÉRENCE (STRATÉGIE MASTER SCALE)
+        var pageW = 480;
+        var pageH = 720;
+        
+        function resize() {
+            var winW = $(window).width();
+            var winH = $(window).height();
+            var isMobile = (winW < 900);
+            var display = isMobile ? 'single' : 'double';
+            
+            // On calcule le cadre cible du flipbook à sa taille réelle
+            var targetW = isMobile ? pageW : pageW * 2;
+            var targetH = pageH;
+            
+            if (flipbook.turn('display') !== display) {
+                flipbook.turn('display', display);
+            }
+            
+            // Mise à jour de la taille interne indispensable pour le centrage Turn.js
+            flipbook.turn('size', targetW, targetH);
+
+            // CALCUL DU SCALE (CONTAIN)
+            // On veut que targetW*scale <= winW et targetH*scale <= winH
+            var scaleX = (winW * 0.95) / targetW;
+            var scaleY = (winH * 0.95) / targetH;
+            var scale = Math.min(scaleX, scaleY);
+            
+            // On applique le scale CSS
+            flipbook.css({
+                'transform': 'scale(' + scale + ')',
+                'position': 'absolute'
+            });
+        }
+
+        flipbook.turn({
+            width: pageW * 2, // Taille initiale double pour setup propre
+            height: pageH,
+            autoCenter: true,
+            display: ($(window).width() < 900) ? 'single' : 'double',
+            acceleration: true,
+            gradients: true,
+            elevation: 50,
+            duration: 800
+        });
+
+        $(window).resize(resize);
+        resize();
+        setTimeout(resize, 200); // Patch iOS orientation change
+
+        // TOUCH HANDLING
+        var ts;
+        flipbook.on('touchstart', function(e) { ts = e.originalEvent.touches[0].pageX; });
+        flipbook.on('touchend', function(e) {
+            var te = e.originalEvent.changedTouches[0].pageX;
+            if (ts > te + 50) flipbook.turn('next');
+            else if (ts < te - 50) flipbook.turn('previous');
+        });
+
+        $('#prev-btn').click(function() { flipbook.turn('previous'); });
+        $('#next-btn').click(function() { flipbook.turn('next'); });
+    });
+
+    // ZOOM PREVENTION
+    document.addEventListener('touchstart', function(e) { 
+        if (e.touches.length > 1) e.preventDefault(); 
+    }, { passive: false });
+    
+    var lastTouchEnd = 0;
+    document.addEventListener('touchend', function(e) {
+        var now = (new Date()).getTime();
+        if (now - lastTouchEnd <= 300) e.preventDefault();
+        lastTouchEnd = now;
+    }, false);
+</script>
+
+</body>
+</html>

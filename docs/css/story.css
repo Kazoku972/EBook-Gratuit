@@ -1,0 +1,146 @@
+/* story.css - Moteur Visuel Story Mode Immersif */
+
+:root {
+    --story-bg: #000000;
+    --story-page-bg: #FFFFFF;
+    --nav-btn-bg: rgba(255, 255, 255, 0.2);
+    --nav-btn-text: #FFFFFF;
+}
+
+/* 1. RESET FULL-SCREEN */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    -webkit-tap-highlight-color: transparent;
+}
+
+html, body {
+    width: 100%;
+    height: 100%;
+    height: 100dvh; /* Dynamic Viewport Height */
+    background: var(--story-bg);
+    overflow: hidden;
+    position: fixed; /* Bloque le scroll système */
+    touch-action: none; /* Bloque les gestes système gênants */
+}
+
+/* 2. VIEWPORT & CONTAINER */
+#flipbook-viewport {
+    width: 100%;
+    height: 100%;
+    height: 100dvh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: var(--story-bg);
+    perspective: 2000px;
+}
+
+#flipbook {
+    margin: 0 auto;
+}
+
+/* 3. PAGE STORY STYLE */
+.flip-page {
+    background-color: var(--story-page-bg);
+    overflow: hidden;
+    box-shadow: none !important; /* Supprime l'effet "livre physique" pour le mode story */
+}
+
+.page-content {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: env(safe-area-inset-top) 15% env(safe-area-inset-bottom);
+    text-align: center;
+    position: relative;
+    box-sizing: border-box;
+    overflow: hidden;
+}
+
+/* Images Immersives - Limitée pour laisser de la place au texte */
+.page-content img {
+    max-width: 100%;
+    max-height: 70%; /* Réduit légèrement pour plus d'espace texte */
+    object-fit: contain;
+    pointer-events: none;
+    margin: 0 auto 20px auto; /* Force le centrage horizontal */
+    display: block;
+}
+
+/* Superposition de texte (Story Overlay) */
+.page-overlay {
+    width: 100%;
+    padding: 25px 15px;
+    background: linear-gradient(transparent, rgba(0,0,0,0.6)); /* Plus sombre pour lisibilité */
+    color: white;
+    pointer-events: none;
+    flex-shrink: 0;
+    line-height: 1.5;
+}
+
+.page-overlay h1, .page-overlay h2 {
+    font-size: clamp(1.4rem, 4vw, 2rem);
+    margin-bottom: 10px;
+}
+
+.page-overlay p {
+    font-size: clamp(1rem, 3vw, 1.2rem);
+    opacity: 0.95;
+}
+
+.quote {
+    font-size: clamp(1.2rem, 3.5vw, 1.6rem) !important;
+    line-height: 1.6;
+    font-style: italic;
+}
+
+.alert-box p {
+    font-size: clamp(1rem, 3vw, 1.2rem) !important;
+}
+
+/* 4. NAVIGATION DISCRÈTE (INSTAGRAM STYLE) */
+.flip-controls {
+    position: fixed;
+    bottom: 30px;
+    left: 0;
+    right: 0;
+    z-index: 1000;
+    display: flex;
+    justify-content: space-between;
+    padding: 0 20px;
+    pointer-events: none;
+}
+
+.btn-nav {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background: var(--nav-btn-bg);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    color: var(--nav-btn-text);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    font-size: 20px;
+    pointer-events: auto; /* Réactive le clic */
+    transition: transform 0.2s ease;
+}
+
+.btn-nav:active {
+    transform: scale(0.9);
+}
+
+/* Masquer les boutons sur mobile : immersion totale via swipe */
+@media (max-width: 900px) {
+    .flip-controls {
+        display: none !important;
+    }
+}
