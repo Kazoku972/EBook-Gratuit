@@ -115,13 +115,20 @@
       }
 
       #preview {
-        margin: auto !important;
+        width: 100% !important;
+        height: 100% !important;
+        display: block !important;
+        margin: 0 !important;
         border: none;
         background: transparent;
         pointer-events: auto !important;
-        touch-action: none !important; /* Turn.js préfère gérer lui-même sans interférence navigateur */
+        touch-action: none !important;
         user-select: none;
+        -webkit-user-select: none;
         -webkit-user-drag: none;
+        /* Fix Safari text autosize */
+        -webkit-text-size-adjust: 100% !important;
+        text-size-adjust: 100% !important;
       }
 
       /* STATUS BADGE */
@@ -222,7 +229,7 @@
         right: 0;
       }
 
-      /* ✅ OPTIMIZATION LANDSCAPE (844x390 & 740x360) */
+      /* ✅ OPTIMIZATION LANDSCAPE (DYNAMIC SCALING) */
       @media (orientation: landscape) and (max-height: 450px) {
         header {
           display: none !important;
@@ -233,24 +240,6 @@
         }
         .presets {
           margin-bottom: 5px !important;
-        }
-      }
-
-      /* Target 844x390 */
-      @media (orientation: landscape) and (width: 844px) and (height: 390px) {
-        .device-frame {
-          transform: scale(0.85);
-          transform-origin: top center;
-          margin-bottom: -60px;
-        }
-      }
-
-      /* Target 740x360 */
-      @media (orientation: landscape) and (width: 740px) and (height: 360px) {
-        .device-frame {
-          transform: scale(0.72);
-          transform-origin: top center;
-          margin-bottom: -110px;
         }
       }
     </style>
@@ -345,9 +334,29 @@
         frame.style.height = h + "px";
 
         const iframe = document.getElementById("preview");
-        // ✅ Fix: Aligner l'iframe sur l'espace interne réel (sans bordures de frame)
-        iframe.width = frame.clientWidth;
-        iframe.height = frame.clientHeight;
+        // iframe sizing handled by CSS (100% width/height of frame)
+
+        // ✅ DYNAMIC SCALING (Auto-fit frame in viewport)
+        // Skip on real mobile/touch devices to avoid layout jitter
+        const isTouch = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
+        const landscape = currentW > currentH;
+        
+        if (!isTouch && landscape) {
+           const vh = window.innerHeight;
+           const targetH = h + 100; // Account for presets/padding
+           if (vh < targetH) {
+              const scale = Math.max(0.5, vh / targetH);
+              frame.style.transform = `scale(${scale})`;
+              frame.style.transformOrigin = "top center";
+              frame.style.marginBottom = `-${(h * (1 - scale))}px`;
+           } else {
+              frame.style.transform = "none";
+              frame.style.marginBottom = "0";
+           }
+        } else {
+           frame.style.transform = "none";
+           frame.style.marginBottom = "0";
+        }
 
         const cleanIframe = () => {
           try {
@@ -371,6 +380,11 @@
               const style = doc.createElement("style");
               style.id = "qa-img-boost";
               style.textContent = `
+                            body {
+                                -webkit-text-size-adjust: 100% !important;
+                                text-size-adjust: 100% !important;
+                                overscroll-behavior: none !important;
+                            }
                             /* Targets: page 2/4/6/7 images only via Turn.js stable classes */
                             #flipbook .p2 .page-content img,
                             #flipbook .p4 .page-content img,
@@ -673,62 +687,68 @@
               if (!$ || !$book.length || typeof $book.turn !== 'function') return;
 
               const isLand = window.__qaData.landscape;
-              const p = $book.turn("page");
+              const total = $book.turn("pages") || 7;
               
               const updateSize = () => {
-                 const fw = window.innerWidth;
-                 const fh = window.innerHeight;
+                 // ✅ SURGICAL SIZING (iOS Robust)
+                 const vv = window.visualViewport;
+                 const fw = vv ? vv.width : window.innerWidth;
+                 const fh = vv ? vv.height : window.innerHeight;
+                 
                  $book.turn("size", fw, fh);
                  $book.css({
                    "margin": "0 auto",
                    "width": fw + "px",
                    "height": fh + "px"
                  });
+                 console.log("[qa-internal] Resize:", fw, "x", fh, "vv:", !!vv);
               };
 
-              // 1. Force Display Mode
-              let targetDisplay = "single";
-              if (isLand) {
-                targetDisplay = (p <= 1) ? "single" : "double";
-              }
-
-              if ($book.turn("display") !== targetDisplay) {
-                $book.turn("display", targetDisplay);
-                console.log("[qa-internal] Display ->", targetDisplay);
-              }
-              
-              updateSize();
-
-              // 2. Gestion Pages Impaires (Land Only)
-              const total = $book.turn("pages");
-              if (isLand && total % 2 !== 0 && !window.__qaPageCheckDone) {
-                 try {
-                    const blank = document.createElement("div");
-                    blank.className = "qa-blank-page";
-                    blank.innerHTML = '<div class="page-content" style="background:white;"></div>';
-                    $book.turn("addPage", blank, total + 1);
-                    window.__qaPageCheckDone = true;
-                    console.log("[qa-internal] Added blank page.");
-                    setTimeout(updateSize, 100);
-                 } catch(e) {}
-              }
-
-              // 3. Hooks Turn.js (Une seule fois)
-              if (!window.__qaEventsAttached) {
-                $book.on("turning", (e, page) => {
-                  const currentIsLand = (window.innerWidth > window.innerHeight);
-                  if (currentIsLand) {
-                    const m = (page <= 1) ? "single" : "double";
-                    if ($book.turn("display") !== m) {
-                       $book.turn("display", m);
+              // ✅ SYNC DISPLAY MODE (P1 single / P2+ double in LAND)
+              const syncDisplay = (page) => {
+                 if (window.innerWidth > window.innerHeight) {
+                    const targetDisplay = (page <= 1) ? "single" : "double";
+                    if ($book.turn("display") !== targetDisplay) {
+                       $book.turn("display", targetDisplay);
+                       console.log("[qa-internal] Display ->", targetDisplay, "at p", page);
                        setTimeout(updateSize, 50);
                     }
+                 } else {
+                    if ($book.turn("display") !== "single") $book.turn("display", "single");
+                 }
+                 updateSize();
+              };
+
+              // 1. Initial State
+              syncDisplay($book.turn("page"));
+              updateSize();
+
+              // 2. Hooks Turn.js (Une seule fois)
+              if (!window.__qaEventsAttached) {
+                $book.on("turning", (e, page) => {
+                  // ✅ CLAMP NAVIGATION (Hard stop at Page 7)
+                  if (page > total) {
+                     e.preventDefault();
+                     console.log("[qa-internal] Navigation BLOCKED >", total);
+                     return;
                   }
+                  if (page < 1) {
+                     e.preventDefault();
+                     return;
+                  }
+                  syncDisplay(page);
                 });
+
                 $book.on("turned", (e, page) => {
                    updateSize();
+                   setTimeout(() => syncDisplay(page), 100);
                    setTimeout(updateSize, 400); 
                 });
+
+                // Force orientation change update
+                window.addEventListener("resize", updateSize);
+                if (window.visualViewport) window.visualViewport.addEventListener("resize", updateSize);
+
                 window.__qaEventsAttached = true;
               }
             })();
