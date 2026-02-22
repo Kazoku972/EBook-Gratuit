@@ -565,90 +565,42 @@
           style.id = "qa-land-only-fit";
           doc.head.appendChild(style);
           
-          console.log("[qa-p1] Land Styles Applied (Fit Images)");
           style.textContent = `
-                    /* P1 Land Only - Responsive Image Fit */
-                    #flipbook .page-content img {
-                        max-height: 31vh !important; /* Laisse respirer le texte */
-                        max-width: 88% !important;
-                        width: auto !important;
-                        height: auto !important;
-                        object-fit: contain !important;
-                        display: block !important;
-                        margin: 4px auto !important;
+                    /* ✅ BOOST VISUEL LAND V9.1 (+10% taille) */
+                    body {
+                        -webkit-text-size-adjust: 100% !important;
+                        text-size-adjust: 100% !important;
+                        overscroll-behavior: none !important;
                     }
-                    /* Space optimization */
-                    .page-content { 
-                        padding: 10px !important;
-                        justify-content: flex-start !important;
+                    .page-content {
+                        padding: 10px 30px !important;
+                        height: 100% !important;
                         display: flex !important;
                         flex-direction: column !important;
+                        justify-content: center !important;
                         align-items: center !important;
+                        box-sizing: border-box !important;
+                        overflow: hidden !important;
                     }
-                    h1, h2 { margin: 4px 0 !important; line-height: 1.1 !important; font-size: 1.2rem !important; }
-                    p { font-size: 0.9rem !important; line-height: 1.3 !important; margin-bottom: 0.8vh !important; }
-                    
-                    /* ✅ PATCH LANDSCAPE FIT — Pages 2, 4, 6, 7 */
-                    @media (max-height: 400px) and (max-width: 950px) {
-                        #flipbook .p2 .page-content, #flipbook .p4 .page-content, 
-                        #flipbook .p6 .page-content, #flipbook .p7 .page-content {
-                            padding: 2% 4% !important;
-                            display: flex !important;
-                            flex-direction: column !important;
-                            justify-content: center !important;
-                            align-items: center !important;
-                            height: 100% !important;
-                            box-sizing: border-box !important;
-                            overflow: hidden !important; /* Désactive le scroll vertical */
-                        }
-                        #flipbook .p2 .page-content img, #flipbook .p4 .page-content img, 
-                        #flipbook .p6 .page-content img, #flipbook .p7 .page-content img {
-                            flex: 0 1 auto !important;
-                            min-height: 0 !important; /* Permet la compression proportionnelle */
-                            max-height: 40% !important; 
-                            width: auto !important;
-                            margin: 1% auto !important;
-                            object-fit: contain !important;
-                        }
-                        #flipbook .p2 h1, #flipbook .p4 h1, #flipbook .p6 h1, #flipbook .p7 h1,
-                        #flipbook .p2 h2, #flipbook .p4 h2, #flipbook .p6 h2, #flipbook .p7 h2 {
-                            font-size: clamp(0.7rem, 4vh, 0.95rem) !important;
-                            line-height: 1.1 !important;
-                            margin: 1% 0 !important;
-                            flex: 0 0 auto !important;
-                            text-align: center !important;
-                        }
-                        #flipbook .p2 p, #flipbook .p4 p, #flipbook .p6 p, #flipbook .p7 p {
-                            font-size: clamp(0.6rem, 3.5vh, 0.78rem) !important;
-                            line-height: 1.2 !important;
-                            margin: 0 0 1% 0 !important;
-                            flex: 0 1 auto !important;
-                            overflow: hidden !important;
-                            text-align: center !important;
-                        }
+                    #flipbook .page-content img {
+                        max-height: 42vh !important;
+                        max-width: 95% !important;
+                        width: auto !important;
+                        margin: 10px auto !important;
+                        object-fit: contain !important;
+                        box-shadow: 0 10px 30px rgba(0,0,0,0.1) !important;
                     }
-                    /* Land Compact (740x360) / Smaller heights */
-                    @media (max-height: 370px) {
-                        #flipbook .p2 .page-content, #flipbook .p4 .page-content, 
-                        #flipbook .p6 .page-content, #flipbook .p7 .page-content {
-                            padding: 1% 2% !important;
-                        }
-                        #flipbook .p2 .page-content img, #flipbook .p4 .page-content img, 
-                        #flipbook .p6 .page-content img, #flipbook .p7 .page-content img {
-                            max-height: 30% !important;
-                            margin: 0 auto !important;
-                        }
-                        #flipbook .p2 p, #flipbook .p4 p, #flipbook .p6 p, #flipbook .p7 p {
-                            font-size: clamp(0.55rem, 3.2vh, 0.72rem) !important;
-                            margin-bottom: 0 !important;
-                        }
-                        #flipbook .p2 h1, #flipbook .p4 h1, #flipbook .p6 h1, #flipbook .p7 h1,
-                        #flipbook .p2 h2, #flipbook .p4 h2, #flipbook .p6 h2, #flipbook .p7 h2 {
-                            margin: 1% 0 0 0 !important;
-                        }
+                    .page-content p {
+                        font-size: 1.05rem !important;
+                        line-height: 1.5 !important;
+                        margin: 8px 0 !important;
+                        flex: 0 1 auto !important;
                     }
-
-                    /* Centrage Flipbook et masquage débordements */
+                    .page-content h1, .page-content h2 {
+                        font-size: 1.7rem !important;
+                        margin: 8px 0 !important;
+                        line-height: 1.2 !important;
+                    }
                     #flipbook { margin: 0 auto !important; overflow: visible !important; }
                     .flip-page { box-shadow: 0 0 15px rgba(0,0,0,0.1) !important; background: white !important; }
                 `;
@@ -679,7 +631,7 @@
           }
 
           // Passer les variables au script interne
-          win.__qaData = { landscape };
+          win.__qaData = { landscape, version: "v10.1-final" };
 
           coreScript.textContent = `
             (function() {
@@ -687,53 +639,58 @@
               const $book = $('#flipbook');
               if (!$ || !$book.length || typeof $book.turn !== 'function') return;
 
-              const total = $book.turn("pages") || 7;
+              const total = 7; // ✅ STRICT LIMIT V10
               
               const updateSize = () => {
-                 // ✅ ROBUST SIZING (visualViewport for iOS/Chrome mobile)
-                 const vv = window.visualViewport;
-                 const fw = vv ? vv.width : window.innerWidth;
-                 const fh = vv ? vv.height : window.innerHeight;
+                 // ✅ ANTI-GHOST CLEANUP
+                 if ($book.turn("pages") > total) {
+                    $book.turn("pages", total);
+                    $('.p8, .p9, .p10, .p11, .p12').remove();
+                 }
+
+                 // ✅ MIRROR SIZING (Iframe Inner Box)
+                 const fw = window.innerWidth;
+                 const fh = window.innerHeight;
                  
                  $book.turn("size", fw, fh);
                  $book.css({
                    "margin": "0 auto",
                    "width": fw + "px",
-                   "height": fh + "px"
+                   "height": fh + "px",
+                   "position": "relative",
+                   "left": "0",
+                   "top": "0"
                  });
-                 console.log("[qa-v8] Resize:", fw, "x", fh, "vv:", !!vv);
+                 console.log("[qa-v10] Mirror Sync:", fw, "x", fh);
               };
 
               // ✅ HYBRID DISPLAY MODE (Strict: P1 single / P2+ double in LAND)
               const syncDisplay = (page) => {
-                 const isLand = (window.innerWidth > window.innerHeight);
-                 if (isLand) {
+                 const isLandscapeNow = (window.innerWidth > window.innerHeight);
+                 if (isLandscapeNow) {
                     const targetMode = (page <= 1) ? "single" : "double";
                     if ($book.turn("display") !== targetMode) {
                        $book.turn("display", targetMode);
-                       console.log("[qa-v8] Mode Switch ->", targetMode, "at page", page);
-                       setTimeout(updateSize, 50);
+                       console.log("[qa-v10] Display ->", targetMode, "at p", page);
                     }
                  } else {
-                    if ($book.turn("display") !== "single") {
-                       $book.turn("display", "single");
-                       setTimeout(updateSize, 50);
-                    }
+                    if ($book.turn("display") !== "single") $book.turn("display", "single");
                  }
                  updateSize();
               };
 
-              // 1. Init
+              // 1. Initial State
+              $book.turn("pages", total);
               syncDisplay($book.turn("page"));
               updateSize();
 
               // 2. Events hooks
               if (!window.__qaEventsAttached) {
                 $book.on("turning", (e, page) => {
-                  // ✅ HARD CLAMP (Stop at page 7)
+                  // ✅ HARD CLAMP (Physical block)
                   if (page > total) {
                      e.preventDefault();
-                     console.warn("[qa-v8] Navigation blocked beyond page", total);
+                     console.warn("[qa-v10] Blocked at max page", total);
                      return;
                   }
                   if (page < 1) {
@@ -745,12 +702,18 @@
 
                 $book.on("turned", (e, page) => {
                    updateSize();
-                   setTimeout(() => syncDisplay(page), 100);
-                   setTimeout(updateSize, 400); 
+                   setTimeout(() => syncDisplay(page), 50);
+                   setTimeout(updateSize, 300); 
                 });
 
-                window.addEventListener("resize", updateSize);
-                if (window.visualViewport) window.visualViewport.addEventListener("resize", updateSize);
+                window.addEventListener("resize", () => {
+                   setTimeout(updateSize, 100);
+                });
+                
+                if (window.visualViewport) {
+                   window.visualViewport.addEventListener("resize", updateSize);
+                   window.visualViewport.addEventListener("scroll", updateSize);
+                }
 
                 window.__qaEventsAttached = true;
               }
