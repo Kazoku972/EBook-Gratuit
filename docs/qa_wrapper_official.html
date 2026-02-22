@@ -2,6 +2,7 @@
 <html lang="fr">
   <head>
     <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
     <title>QA Virtual Device Laboratory - V4.0</title>
     <style>
       :root {
@@ -686,11 +687,10 @@
               const $book = $('#flipbook');
               if (!$ || !$book.length || typeof $book.turn !== 'function') return;
 
-              const isLand = window.__qaData.landscape;
               const total = $book.turn("pages") || 7;
               
               const updateSize = () => {
-                 // ✅ SURGICAL SIZING (iOS Robust)
+                 // ✅ ROBUST SIZING (visualViewport for iOS/Chrome mobile)
                  const vv = window.visualViewport;
                  const fw = vv ? vv.width : window.innerWidth;
                  const fh = vv ? vv.height : window.innerHeight;
@@ -701,35 +701,39 @@
                    "width": fw + "px",
                    "height": fh + "px"
                  });
-                 console.log("[qa-internal] Resize:", fw, "x", fh, "vv:", !!vv);
+                 console.log("[qa-v8] Resize:", fw, "x", fh, "vv:", !!vv);
               };
 
-              // ✅ SYNC DISPLAY MODE (P1 single / P2+ double in LAND)
+              // ✅ HYBRID DISPLAY MODE (Strict: P1 single / P2+ double in LAND)
               const syncDisplay = (page) => {
-                 if (window.innerWidth > window.innerHeight) {
-                    const targetDisplay = (page <= 1) ? "single" : "double";
-                    if ($book.turn("display") !== targetDisplay) {
-                       $book.turn("display", targetDisplay);
-                       console.log("[qa-internal] Display ->", targetDisplay, "at p", page);
+                 const isLand = (window.innerWidth > window.innerHeight);
+                 if (isLand) {
+                    const targetMode = (page <= 1) ? "single" : "double";
+                    if ($book.turn("display") !== targetMode) {
+                       $book.turn("display", targetMode);
+                       console.log("[qa-v8] Mode Switch ->", targetMode, "at page", page);
                        setTimeout(updateSize, 50);
                     }
                  } else {
-                    if ($book.turn("display") !== "single") $book.turn("display", "single");
+                    if ($book.turn("display") !== "single") {
+                       $book.turn("display", "single");
+                       setTimeout(updateSize, 50);
+                    }
                  }
                  updateSize();
               };
 
-              // 1. Initial State
+              // 1. Init
               syncDisplay($book.turn("page"));
               updateSize();
 
-              // 2. Hooks Turn.js (Une seule fois)
+              // 2. Events hooks
               if (!window.__qaEventsAttached) {
                 $book.on("turning", (e, page) => {
-                  // ✅ CLAMP NAVIGATION (Hard stop at Page 7)
+                  // ✅ HARD CLAMP (Stop at page 7)
                   if (page > total) {
                      e.preventDefault();
-                     console.log("[qa-internal] Navigation BLOCKED >", total);
+                     console.warn("[qa-v8] Navigation blocked beyond page", total);
                      return;
                   }
                   if (page < 1) {
@@ -745,7 +749,6 @@
                    setTimeout(updateSize, 400); 
                 });
 
-                // Force orientation change update
                 window.addEventListener("resize", updateSize);
                 if (window.visualViewport) window.visualViewport.addEventListener("resize", updateSize);
 
