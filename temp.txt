@@ -1,32 +1,44 @@
-import React, { useState, useEffect, useRef } from 'react';
+﻿import React, { useState, useEffect, useRef } from 'react';
 import HTMLFlipBook from 'react-pageflip';
 import Page from './Page';
 import Controls from './Controls';
 
 // Import assets (example for paths)
 import couverture from '../assets/images/couverture.webp';
-import matin from '../assets/images/Scène Réveil Matin Chaotique.webp';
-import guerriere from '../assets/images/Illustration 1.1 - La remise en perspective (La guerrière).webp';
+import matin from '../assets/images/Sc├¿ne R├®veil Matin Chaotique.webp';
+import guerriere from '../assets/images/Illustration 1.1 - La remise en perspective (La guerri├¿re).webp';
 import miroir from '../assets/images/Illustration 6.1 - Le miroir bienveillant (Auto-affirmation).webp';
-import coucher from '../assets/images/Scène Coucher Tendre.webp';
+import coucher from '../assets/images/Sc├¿ne Coucher Tendre.webp';
 
 const Book = () => {
     const [dimensions, setDimensions] = useState({
-        width: window.innerWidth > 768 ? 600 : window.innerWidth,
-        height: window.innerHeight,
+        width: 320,
+        height: 480,
     });
     const [page, setPage] = useState(0);
     const bookRef = useRef();
 
     useEffect(() => {
-        const handleResize = () => {
+        const updateDimensions = () => {
+            const w = window.innerWidth;
+            const h = window.innerHeight;
+            
+            // On mobile portrait, we want to maximize the cover/page scale
+            const isMobile = w <= 768;
             setDimensions({
-                width: window.innerWidth > 768 ? 600 : window.innerWidth,
-                height: window.innerHeight,
+                width: isMobile ? w : 600,
+                height: h,
             });
         };
-        window.addEventListener('resize', handleResize);
-        return () => window.removeEventListener('resize', handleResize);
+
+        updateDimensions();
+        window.addEventListener('resize', updateDimensions);
+        window.addEventListener('orientationchange', updateDimensions);
+        
+        return () => {
+            window.removeEventListener('resize', updateDimensions);
+            window.removeEventListener('orientationchange', updateDimensions);
+        };
     }, []);
 
     const onFlip = (e) => {
@@ -34,7 +46,7 @@ const Book = () => {
     };
 
     return (
-        <div className="flex justify-center items-center w-full h-dvh bg-[#f0f0f0] overflow-hidden">
+        <div className="flex justify-center items-center w-full h-screen h-[100dvh] bg-[#f0f0f0] overflow-hidden fixed inset-0">
             <HTMLFlipBook
                 width={dimensions.width}
                 height={dimensions.height}
@@ -59,7 +71,7 @@ const Book = () => {
                     <div className="flex flex-col items-center justify-center h-full bg-[#F9F7F2] w-full p-6">
                         <img src={couverture} alt="Couverture" className="max-h-[480px] w-auto rounded-xl shadow-lg mb-6 border-2 border-white" />
                         <h1 className="text-4xl text-[#E8A3A8] font-bold uppercase mb-2">On est ensemble, Maman</h1>
-                        <p className="italic text-[#B7C6B0]">Douceur et Lumière au Quotidien</p>
+                        <p className="italic text-[#B7C6B0]">Douceur et Lumi├¿re au Quotidien</p>
                     </div>
                 </Page>
 
@@ -68,10 +80,10 @@ const Book = () => {
                     <h2 className="text-2xl text-[#B7C6B0] font-bold mb-4 mt-8">Avant-propos</h2>
                     <img src={matin} alt="Matin" className="w-full max-h-[40%] object-contain mb-4 rounded-lg" />
                     <p className="text-[#444] leading-relaxed mb-4">
-                        Imagine une lumière matinale, douce et dorée... l’odeur du café qui infuse... et cette sensation que tout va un peu trop vite.
+                        Imagine une lumi├¿re matinale, douce et dor├®e... lÔÇÖodeur du caf├® qui infuse... et cette sensation que tout va un peu trop vite.
                     </p>
                     <p className="text-[#444] leading-relaxed">
-                        Moi, c'est <strong>Marine</strong>. Je vis ce "chaos joyeux" chaque jour avec <strong>Kaïto</strong> (4 ans) et <strong>Yuna</strong> (2 ans).
+                        Moi, c'est <strong>Marine</strong>. Je vis ce "chaos joyeux" chaque jour avec <strong>Ka├»to</strong> (4 ans) et <strong>Yuna</strong> (2 ans).
                     </p>
                 </Page>
 
@@ -79,23 +91,23 @@ const Book = () => {
                 <Page number="3">
                     <div className="flex flex-col items-center justify-center h-full">
                         <div className="italic text-xl text-center p-8 relative mb-4 before:content-['\201C'] before:text-6xl before:text-[#E8A3A8] before:absolute before:top-[-10px] before:left-1/2 before:-translate-x-1/2 before:opacity-20">
-                            "Tu n'es pas seule. Et tu n'as pas à porter ce poids toute seule."
+                            "Tu n'es pas seule. Et tu n'as pas ├á porter ce poids toute seule."
                         </div>
                         <p className="text-center text-[#B7C6B0]">
-                            — On est ensemble, Maman
+                            ÔÇö On est ensemble, Maman
                         </p>
                     </div>
                 </Page>
 
                 {/* PAGE 4: CHAPITRE 1 */}
                 <Page number="4">
-                    <h2 className="text-2xl text-[#B7C6B0] font-bold mb-4 mt-8">1. Le Miroir de la Guerrière</h2>
+                    <h2 className="text-2xl text-[#B7C6B0] font-bold mb-4 mt-8">1. Le Miroir de la Guerri├¿re</h2>
                     <p className="text-[#444] leading-relaxed mb-4 text-left">
-                        Devenir maman, c'est voir un paysage transformé par un tsunami. Porter la vie est une force de guerrière cachée sous une peau fatiguée.
+                        Devenir maman, c'est voir un paysage transform├® par un tsunami. Porter la vie est une force de guerri├¿re cach├®e sous une peau fatigu├®e.
                     </p>
-                    <img src={guerriere} alt="Guerrière" className="w-full max-h-[40%] object-contain mb-4 rounded-lg" />
+                    <img src={guerriere} alt="Guerri├¿re" className="w-full max-h-[40%] object-contain mb-4 rounded-lg" />
                     <p className="italic text-sm text-[#444]">
-                        "Être vulnérable aujourd'hui, ce n'est pas être faible. C'est être vivante."
+                        "├ètre vuln├®rable aujourd'hui, ce n'est pas ├¬tre faible. C'est ├¬tre vivante."
                     </p>
                 </Page>
 
@@ -103,21 +115,21 @@ const Book = () => {
                 <Page number="5">
                     <div className="flex flex-col items-center justify-center h-full w-full">
                         <div className="border-l-4 border-[#6D8264] bg-[#B7C6B0]/10 p-6 rounded-r-xl text-left text-[#333] w-full">
-                            <strong className="block mb-2 text-[#222]">À retenir</strong>
-                            Ta fatigue est le témoin de tout l'amour que tu diffuses. Elle mérite d'être honorée, pas jugée.
+                            <strong className="block mb-2 text-[#222]">├Ç retenir</strong>
+                            Ta fatigue est le t├®moin de tout l'amour que tu diffuses. Elle m├®rite d'├¬tre honor├®e, pas jug├®e.
                         </div>
                     </div>
                 </Page>
 
                 {/* PAGE 6: EXERCICE */}
                 <Page number="6">
-                    <h2 className="text-2xl text-[#B7C6B0] font-bold mb-4 mt-8">🌟 L'Équilibre dans le Chaos</h2>
+                    <h2 className="text-2xl text-[#B7C6B0] font-bold mb-4 mt-8">­ƒîƒ L'├ëquilibre dans le Chaos</h2>
                     <p className="text-[#444] leading-relaxed mb-4 text-left">
-                        La vraie vie a des couleurs vibrantes : le bleu de la peinture, le rose des joues, le beige du désordre.
+                        La vraie vie a des couleurs vibrantes : le bleu de la peinture, le rose des joues, le beige du d├®sordre.
                     </p>
                     <img src={miroir} alt="Miroir" className="w-full max-h-[40%] object-contain mb-4 rounded-lg" />
                     <div className="italic mt-4 text-sm text-[#333]">
-                        <strong className="text-[#222]">Pacte de Lumière :</strong> "Je m'autorise à être une femme imparfaite et une maman aimante."
+                        <strong className="text-[#222]">Pacte de Lumi├¿re :</strong> "Je m'autorise ├á ├¬tre une femme imparfaite et une maman aimante."
                     </div>
                 </Page>
 
@@ -127,10 +139,10 @@ const Book = () => {
                         <img src={coucher} alt="Coucher" className="w-full max-h-[40%] object-contain mb-4 rounded-lg" />
                         <h2 className="text-xl text-[#B7C6B0] font-bold mb-2">On est ensemble</h2>
                         <p className="text-sm text-[#444] mb-4">
-                            Ce guide est une petite lampe de chevet pour tes nuits trop courtes. Tu n'as pas à briller seule.
+                            Ce guide est une petite lampe de chevet pour tes nuits trop courtes. Tu n'as pas ├á briller seule.
                         </p>
                         <p className="font-serif text-[#E8A3A8] text-2xl mt-2 italic">
-                            Marine 💕
+                            Marine ­ƒÆò
                         </p>
                     </div>
                 </Page>
