@@ -119,14 +119,12 @@ const Book = ({ isDarkMode, language }) => {
 
                 {/* PAGE 3: CITATION */}
                 <Page number="3" isDarkMode={isDarkMode} centered>
-                    <div className="flex flex-col items-center justify-center h-full">
-                        <div className={`italic text-xl text-center p-8 relative mb-4 before:content-['\\201C'] before:text-6xl before:absolute before:top-[-10px] before:left-1/2 before:-translate-x-1/2 before:opacity-20 transition-colors duration-500 ${isDarkMode ? 'text-[#d1d1d1] before:text-[#E8A3A8]' : 'text-[#444] before:text-[#E8A3A8]'}`}>
-                            {t.page3.quote}
-                        </div>
-                        <p className={`text-center transition-colors duration-500 ${isDarkMode ? 'text-[#B7C6B0]' : 'text-[#B7C6B0]'}`}>
-                            {t.page3.author}
-                        </p>
+                    <div className={`italic text-xl text-center p-8 relative mb-4 before:content-['\\201C'] before:text-6xl before:absolute before:top-[-10px] before:left-1/2 before:-translate-x-1/2 before:opacity-20 transition-colors duration-500 ${isDarkMode ? 'text-[#d1d1d1] before:text-[#E8A3A8]' : 'text-[#444] before:text-[#E8A3A8]'}`}>
+                        {t.page3.quote}
                     </div>
+                    <p className={`text-center transition-colors duration-500 ${isDarkMode ? 'text-[#B7C6B0]' : 'text-[#B7C6B0]'}`}>
+                        {t.page3.author}
+                    </p>
                 </Page>
 
                 {/* PAGE 4: CHAPITRE 1 */}
@@ -145,13 +143,11 @@ const Book = ({ isDarkMode, language }) => {
 
                 {/* PAGE 5: RAPPEL */}
                 <Page number="5" isDarkMode={isDarkMode} centered>
-                    <div className="flex flex-col items-center justify-center h-full w-full">
-                        <div className={`border-l-4 p-6 rounded-r-xl text-center w-full transition-all duration-500 ${isDarkMode ? 'border-[#6D8264] bg-[#B7C6B0]/10 text-[#d1d1d1]' : 'border-[#6D8264] bg-[#B7C6B0]/10 text-[#333]'}`}>
-                            <strong className={`block mb-2 transition-colors duration-500 ${isDarkMode ? 'text-white' : 'text-[#222]'}`}>
-                                {t.page5.label}
-                            </strong>
-                            {t.page5.text}
-                        </div>
+                    <div className={`border-l-4 p-6 rounded-r-xl text-center w-full transition-all duration-500 ${isDarkMode ? 'border-[#6D8264] bg-[#B7C6B0]/10 text-[#d1d1d1]' : 'border-[#6D8264] bg-[#B7C6B0]/10 text-[#333]'}`}>
+                        <strong className={`block mb-2 transition-colors duration-500 ${isDarkMode ? 'text-white' : 'text-[#222]'}`}>
+                            {t.page5.label}
+                        </strong>
+                        {t.page5.text}
                     </div>
                 </Page>
 
