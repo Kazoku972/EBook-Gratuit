@@ -13,7 +13,7 @@ const Page = forwardRef(({ number, children, density, isDarkMode, centered }, re
       data-page={number}
     >
       {centered ? (
-        <div className="absolute inset-0 flex flex-col items-center justify-center text-center px-4">
+        <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: '100vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', textAlign: 'center', padding: '0 1rem' }}>
           {children}
         </div>
       ) : (
