@@ -37,3 +37,33 @@ body.dark-mode {
 }
 
 
+/* --- V1 LANDSCAPE CUSTOM FIXES --- */
+
+.flipbook .page:nth-child(1) img {
+    width: 25% !important;
+    height: auto !important;
+    object-fit: contain !important;
+    margin: 0 auto !important;
+    display: block !important;
+}
+
+.flipbook .page:nth-child(3) .page-content,
+.flipbook .page:nth-child(5) .page-content {
+    display: flex !important;
+    justify-content: center !important;
+    align-items: flex-start !important;
+    text-align: center !important;
+    height: 100% !important;
+    padding-top: 40px !important; /* ajuster si besoin */
+}
+
+html, body {
+    overflow: hidden !important;
+    height: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+.flipbook-viewport {
+    overflow: hidden !important;
+}

@@ -90,7 +90,7 @@ const Book = ({ isDarkMode, language }) => {
                 flippingTime={2500}
                 showCover={true}
                 mobileScrollSupport={true}
-                className="shadow-2xl"
+                className="flipbook shadow-2xl"
                 ref={bookRef}
                 onFlip={onFlip}
             >
