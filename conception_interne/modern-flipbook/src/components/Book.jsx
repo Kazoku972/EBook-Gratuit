@@ -146,7 +146,7 @@ const Book = ({ isDarkMode, language }) => {
                 {/* PAGE 5: RAPPEL */}
                 <Page number="5" isDarkMode={isDarkMode}>
                     <div className="flex flex-col items-center justify-center h-full w-full">
-                        <div className={`border-l-4 p-6 rounded-r-xl text-left w-full transition-all duration-500 ${isDarkMode ? 'border-[#6D8264] bg-[#B7C6B0]/10 text-[#d1d1d1]' : 'border-[#6D8264] bg-[#B7C6B0]/10 text-[#333]'}`}>
+                        <div className={`border-l-4 p-6 rounded-r-xl text-center w-full transition-all duration-500 ${isDarkMode ? 'border-[#6D8264] bg-[#B7C6B0]/10 text-[#d1d1d1]' : 'border-[#6D8264] bg-[#B7C6B0]/10 text-[#333]'}`}>
                             <strong className={`block mb-2 transition-colors duration-500 ${isDarkMode ? 'text-white' : 'text-[#222]'}`}>
                                 {t.page5.label}
                             </strong>
