@@ -21,11 +21,13 @@ const Page = forwardRef(({ number, children, density, isDarkMode, centered, view
           {children}
         </div>
       )}
-      <div className={`absolute bottom-2 right-4 text-xs font-medium transition-colors duration-500 ${
-        isDarkMode ? 'text-gray-600' : 'text-gray-400'
-      }`}>
-        {number}
-      </div>
+      {!centered && (
+        <div className={`absolute bottom-2 right-4 text-xs font-medium transition-colors duration-500 ${
+          isDarkMode ? 'text-gray-600' : 'text-gray-400'
+        }`}>
+          {number}
+        </div>
+      )}
     </div>
   );
 });
