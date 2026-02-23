@@ -11,13 +11,25 @@ import coucher from '../assets/images/Scène Coucher Tendre.webp';
 
 import { translations } from '../translations';
 
+// Simple debounce function to limit the rate at which a function can fire.
+const debounce = (func, wait) => {
+  let timeout;
+  return function executedFunction(...args) {
+    const later = () => {
+      clearTimeout(timeout);
+      func(...args);
+    };
+    clearTimeout(timeout);
+    timeout = setTimeout(later, wait);
+  };
+};
+
 const Book = ({ isDarkMode, language }) => {
     const t = translations[language];
     const [dimensions, setDimensions] = useState({
         width: window.innerWidth > 768 ? 600 : window.innerWidth,
         height: window.innerHeight,
     });
-    const [page, setPage] = useState(0);
     const bookRef = useRef();
     const containerRef = useRef();
 
@@ -28,8 +40,15 @@ const Book = ({ isDarkMode, language }) => {
                 height: window.innerHeight,
             });
         };
-        window.addEventListener('resize', handleResize);
-        return () => window.removeEventListener('resize', handleResize);
+
+        // Use debounced version for the event listener to improve performance
+        const debouncedHandleResize = debounce(handleResize, 150);
+
+        // Initial sizing check
+        handleResize();
+
+        window.addEventListener('resize', debouncedHandleResize);
+        return () => window.removeEventListener('resize', debouncedHandleResize);
     }, []);
 
     // Auto-complete page flip when dragged past 45%
@@ -68,10 +87,6 @@ const Book = ({ isDarkMode, language }) => {
         };
     }, []);
 
-    const onFlip = (e) => {
-        setPage(e.data);
-    };
-
     return (
         <div ref={containerRef} className="flex justify-center items-center w-full min-h-screen h-dvh transition-colors duration-500 overflow-hidden relative">
             <HTMLFlipBook
@@ -88,7 +103,6 @@ const Book = ({ isDarkMode, language }) => {
                 mobileScrollSupport={true}
                 className="shadow-2xl"
                 ref={bookRef}
-                onFlip={onFlip}
             >
                 {/* PAGE 1: COUVERTURE */}
                 <Page number="1" density="hard" isDarkMode={isDarkMode}>
