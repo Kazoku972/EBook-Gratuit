@@ -13,20 +13,24 @@ import { translations } from '../translations';
 
 const Book = ({ isDarkMode, language }) => {
     const t = translations[language];
-    const [dimensions, setDimensions] = useState({
-        width: window.innerWidth > 768 ? 600 : window.innerWidth,
-        height: window.innerHeight,
-    });
+    const calculateDimensions = () => {
+        let w = window.innerWidth;
+        let h = w * (9 / 16);
+        if (h > window.innerHeight) {
+            h = window.innerHeight;
+            w = h * (16 / 9);
+        }
+        return { width: w, height: h };
+    };
+
+    const [dimensions, setDimensions] = useState(calculateDimensions());
     const [page, setPage] = useState(0);
     const bookRef = useRef();
     const containerRef = useRef();
 
     useEffect(() => {
         const handleResize = () => {
-            setDimensions({
-                width: window.innerWidth > 768 ? 600 : window.innerWidth,
-                height: window.innerHeight,
-            });
+            setDimensions(calculateDimensions());
         };
         window.addEventListener('resize', handleResize);
         return () => window.removeEventListener('resize', handleResize);
