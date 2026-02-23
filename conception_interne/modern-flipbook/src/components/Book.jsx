@@ -19,6 +19,7 @@ const Book = ({ isDarkMode, language }) => {
     });
     const [page, setPage] = useState(0);
     const bookRef = useRef();
+    const containerRef = useRef();
 
     useEffect(() => {
         const handleResize = () => {
@@ -31,12 +32,48 @@ const Book = ({ isDarkMode, language }) => {
         return () => window.removeEventListener('resize', handleResize);
     }, []);
 
+    // Auto-complete page flip when dragged past 45%
+    useEffect(() => {
+        const container = containerRef.current;
+        if (!container) return;
+
+        let startX = 0;
+
+        const onTouchStart = (e) => {
+            startX = e.touches[0].clientX;
+        };
+
+        const onTouchEnd = (e) => {
+            const endX = e.changedTouches[0].clientX;
+            const deltaX = startX - endX;
+            const threshold = container.offsetWidth * 0.20; // 20% of width
+
+            if (Math.abs(deltaX) > threshold && bookRef.current) {
+                if (deltaX > 0) {
+                    // Swiped left → next page
+                    bookRef.current.pageFlip().flipNext();
+                } else {
+                    // Swiped right → previous page
+                    bookRef.current.pageFlip().flipPrev();
+                }
+            }
+        };
+
+        container.addEventListener('touchstart', onTouchStart, { passive: true });
+        container.addEventListener('touchend', onTouchEnd, { passive: true });
+
+        return () => {
+            container.removeEventListener('touchstart', onTouchStart);
+            container.removeEventListener('touchend', onTouchEnd);
+        };
+    }, []);
+
     const onFlip = (e) => {
         setPage(e.data);
     };
 
     return (
-        <div className="flex justify-center items-center w-full min-h-screen h-dvh transition-colors duration-500 overflow-hidden relative">
+        <div ref={containerRef} className="flex justify-center items-center w-full min-h-screen h-dvh transition-colors duration-500 overflow-hidden relative">
             <HTMLFlipBook
                 width={dimensions.width}
                 height={dimensions.height}
