@@ -20,8 +20,8 @@ function App() {
   return (
     <div className="App transition-colors duration-500">
       
-      {/* FLOATING CONTROLS CONTAINER - BOTTOM LEFT & SMALL */}
-      <div className="fixed bottom-8 left-8 z-60 flex gap-2">
+      {/* FLOATING CONTROLS CONTAINER - TOP LEFT */}
+      <div className="fixed top-6 left-6 z-60 flex gap-2">
         {/* LANGUAGE TOGGLE */}
         <button 
           onClick={toggleLanguage}
