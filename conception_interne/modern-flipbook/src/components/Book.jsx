@@ -36,7 +36,7 @@ const Book = ({ isDarkMode, language }) => {
     };
 
     return (
-        <div className={`flex justify-center items-center w-full h-dvh transition-colors duration-500 overflow-hidden ${isDarkMode ? 'bg-[#121212]' : 'bg-[#f0f0f0]'}`}>
+        <div className={`flex justify-center items-center w-full min-h-screen h-[100dvh] transition-colors duration-500 overflow-hidden relative ${isDarkMode ? 'bg-[#121212]' : 'bg-[#f0f0f0]'}`}>
             <HTMLFlipBook
                 width={dimensions.width}
                 height={dimensions.height}
