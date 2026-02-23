@@ -1,6 +1,6 @@
 import React, { forwardRef } from 'react';
 
-const Page = forwardRef(({ number, children, density, isDarkMode, centered }, ref) => {
+const Page = forwardRef(({ number, children, density, isDarkMode, centered, viewportHeight }, ref) => {
   return (
     <div 
       className={`overflow-hidden shadow-inner relative flex flex-col items-center text-center px-4 py-6 transition-all duration-500 ${
@@ -12,8 +12,8 @@ const Page = forwardRef(({ number, children, density, isDarkMode, centered }, re
       data-density={density || 'soft'}
       data-page={number}
     >
-      {centered ? (
-        <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: '100vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', textAlign: 'center', padding: '0 1rem' }}>
+      {centered && viewportHeight ? (
+        <div style={{ width: '100%', height: viewportHeight, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', textAlign: 'center', padding: '0 1rem' }}>
           {children}
         </div>
       ) : (
