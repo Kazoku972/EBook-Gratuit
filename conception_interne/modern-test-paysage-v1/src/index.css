@@ -54,7 +54,7 @@ body.dark-mode {
     align-items: flex-start !important;
     text-align: center !important;
     height: 100% !important;
-    padding-top: 120px !important; /* ajuster si besoin */
+    padding-top: 40px !important; /* ajuster si besoin */
 }
 
 html, body {
