@@ -10,7 +10,7 @@ export default defineConfig({
   ],
   base: '/RefonteEbook/modern/',
   build: {
-    outDir: '../../docs/modern',
+    outDir: './docs/modern',
     emptyOutDir: true,
   }
 })
