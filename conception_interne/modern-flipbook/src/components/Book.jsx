@@ -83,6 +83,7 @@ const Book = ({ isDarkMode, language }) => {
                 minHeight={400}
                 maxHeight={1533}
                 maxShadowOpacity={isDarkMode ? 0.8 : 0.5}
+                flippingTime={1500}
                 showCover={true}
                 mobileScrollSupport={true}
                 className="shadow-2xl"
