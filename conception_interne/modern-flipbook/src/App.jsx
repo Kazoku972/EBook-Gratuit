@@ -20,35 +20,31 @@ function App() {
   return (
     <div className="App transition-colors duration-500">
       
-      {/* FLOATING CONTROLS CONTAINER */}
-      <div className="fixed top-6 right-6 z-60 flex gap-3">
+      {/* FLOATING CONTROLS CONTAINER - MOVED TO BOTTOM LEFT & SHRUNK */}
+      <div className="fixed bottom-8 left-8 z-60 flex gap-2">
         {/* LANGUAGE TOGGLE */}
         <button 
           onClick={toggleLanguage}
-          className={`group flex items-center gap-2 px-4 py-3 rounded-full shadow-lg transition-all active:scale-95 ${
+          className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full shadow-lg backdrop-blur-md transition-all duration-300 hover:scale-105 active:scale-95 border ${
             isDarkMode 
-              ? 'bg-[#2a2a2a] text-[#B7C6B0] border border-white/10 hover:bg-[#333]' 
-              : 'bg-white text-[#6D8264] border border-black/5 hover:bg-gray-50'
+            ? 'bg-white/10 border-white/20 text-white' 
+            : 'bg-white/80 border-gray-200 text-gray-800'
           }`}
-          title={t.langSwitch}
         >
-          <Languages size={20} className="group-hover:rotate-12 transition-transform" />
-          <span className="font-bold text-sm tracking-widest uppercase">
-            {language === 'fr' ? 'EN' : 'FR'}
-          </span>
+          <Languages size={18} />
+          <span className="text-xs font-bold uppercase trackin-wider">{language}</span>
         </button>
 
         {/* THEME TOGGLE */}
         <button 
           onClick={toggleTheme}
-          className={`p-3 rounded-full shadow-lg transition-all active:scale-95 ${
+          className={`p-2 rounded-full shadow-lg backdrop-blur-md transition-all duration-300 hover:scale-105 active:scale-95 border ${
             isDarkMode 
-              ? 'bg-[#2a2a2a] text-[#E8A3A8] border border-white/10 hover:bg-[#333]' 
-              : 'bg-white text-[#6D8264] border border-black/5 hover:bg-gray-50'
+            ? 'bg-white/10 border-white/20 text-yellow-400' 
+            : 'bg-white/80 border-gray-200 text-gray-600'
           }`}
-          title={isDarkMode ? t.dayMode : t.nightMode}
         >
-          {isDarkMode ? <Sun size={24} /> : <Moon size={24} />}
+          {isDarkMode ? <Sun size={18} /> : <Moon size={18} />}
         </button>
       </div>
 
