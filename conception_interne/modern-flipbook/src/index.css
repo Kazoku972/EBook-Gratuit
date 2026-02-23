@@ -36,22 +36,4 @@ body.dark-mode {
   transition: background-color 0.5s ease, color 0.5s ease, border-color 0.5s ease, opacity 0.5s ease, filter 0.5s ease;
 }
 
-/* Force vertical + horizontal centering on pages 3 and 5 */
-[data-page="3"],
-[data-page="5"] {
-  display: flex !important;
-  justify-content: center !important;
-  align-items: center !important;
-  text-align: center !important;
-}
 
-[data-page="3"] > div,
-[data-page="5"] > div {
-  display: flex !important;
-  flex-direction: column !important;
-  justify-content: center !important;
-  align-items: center !important;
-  height: 100% !important;
-  width: 100% !important;
-  text-align: center !important;
-}
