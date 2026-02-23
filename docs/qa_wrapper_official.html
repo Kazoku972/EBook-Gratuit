@@ -264,6 +264,17 @@
     <header>
       <h1>Virtual Device Lab</h1>
       <div class="stats" id="device-info">iPhone SE | 375x667</div>
+      
+      <div style="margin-top: 15px;">
+        <label for="flipbook-selector" style="font-size: 12px; color: #aaa; margin-right: 5px;">SOURCE :</label>
+        <select id="flipbook-selector" style="background: #222; color: #fff; border: 1px solid #444; padding: 5px; border-radius: 5px; font-size: 12px; cursor: pointer; outline: none;">
+          <option value="./modern/index.html">PRODUCTION V36 (React)</option>
+          <option value="./modern-test-paysage-v2/index.html">SANDBOX V2 (React)</option>
+          <option value="./modern-test-paysage-v1/index.html">SANDBOX V1 (React)</option>
+          <option value="./ebook_flipbook.backup.html" selected>BACKUP V12 (Turn.js)</option>
+          <option value="./archives/flipbook_sandbox/ebook_flipbook_original_buggy.html">ARCHIVE BUGGY (Turn.js)</option>
+        </select>
+      </div>
     </header>
 
     <div class="presets">
@@ -325,7 +336,6 @@
     <!-- BLOC OBSOLÈTE SUPPRIMÉ -->
 
     <script>
-      const ACTIVE_FLIPBOOK_SRC = "./ebook_flipbook.backup.html"; // Option A
       const params = new URLSearchParams(window.location.search);
       let currentW = parseInt(params.get("w")) || 375;
       let currentH = parseInt(params.get("h")) || 667;
@@ -430,8 +440,14 @@
           setTimeout(applyDisplayMode, 100);
         };
 
-        // Initialisation de la source
-        iframe.src = ACTIVE_FLIPBOOK_SRC;
+        // Lecture de la source depuis le menu déroulant
+        const sourceSelector = document.getElementById("flipbook-selector");
+        const selectedSrc = sourceSelector ? sourceSelector.value : "./ebook_flipbook.backup.html";
+        
+        // Anti-clignotement : ne recharger l'iframe que si la source change
+        if (iframe.getAttribute('src') !== selectedSrc) {
+            iframe.src = selectedSrc;
+        }
 
         // PATCH DE FOCUS POUR TURN.JS (WRAPPER ONLY)
         // Garantit que l'iframe reçoit les événements dès le premier toucher/clic
@@ -824,6 +840,16 @@
       window.addEventListener("resize", applyDisplayMode);
       if (window.visualViewport) window.visualViewport.addEventListener("resize", applyDisplayMode);
       window.addEventListener("orientationchange", () => setTimeout(applyDisplayMode, 200));
+      
+      const selector = document.getElementById("flipbook-selector");
+      if (selector) {
+          selector.addEventListener("change", () => {
+              // Réinitialiser le masque pour forcer le nettoyage sur la nouvelle iframe
+              const iframe = document.getElementById("preview");
+              iframe.style.opacity = "0"; 
+              updateUI();
+          });
+      }
 
       updateUI();
     </script>
